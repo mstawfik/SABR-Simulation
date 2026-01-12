@@ -1,0 +1,307 @@
+\documentclass[12pt,oneside]{article}
+\usepackage{etoolbox}
+\usepackage[T1]{fontenc}
+\usepackage[full]{textcomp}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+%\usepackage[dvips]{graphics,color}      % usual driver for dvi or ps viewer
+\usepackage[]{graphicx,color}      % usual driver for converting to pdf later
+\usepackage[bottom=1in]{geometry}
+\usepackage{verbatim}
+%\usepackage[cmintegrals,cmbraces]{newtxmath}
+\usepackage[intlimits]{amsmath}    % need for subequations
+%\usepackage[]{amsmath}    % need for subequations
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\usepackage{ebgaramond-maths}
+\usepackage[sb]{ebgaramond} %semi-bold option
+%\input{../ebgaramond-missing.tex}
+\usepackage[boxed]{algorithm2e}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{courier}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{longtable}
+\usepackage{cellspace}
+%\usepackage{multirow}
+%\usepackage{subsection}
+
+%\renewcommand{\rmdefault}{ugm} %old Garamond
+\newcommand{\ttt}[1]{\texttt{\footnotesize{#1}}}
+\graphicspath{./}
+\DeclareGraphicsExtensions{.pdf,.eps}
+
+\newcommand{\beqn}{\begin{equation}}
+\newcommand{\eeqn}{\end{equation}}
+\newcommand{\beqnn}{\begin{equation*}}
+\newcommand{\eeqnn}{\end{equation*}}
+\newcommand{\half}{\text{\scriptsize\ensuremath{\frac{1}{2}}}}
+\newcommand{\redsize}[1]{\text{\scriptsize\ensuremath{#1}}}
+\newcommand{\bsym}[1]{\boldsymbol{#1}}
+\newcommand{\tinysize}[1]{\text{\tiny\ensuremath{#1}}}
+\newcommand{\eee}{\text{\large{\rm e}}}
+\newcommand{\E}{{\rm I\kern-.3em E}}
+\newcommand{\var}{{\rm Var}}
+\newcommand{\defas}{\overset{*}{=}}
+\newcommand{\sL}{{L}}
+\newcommand{\edge}[2]{#1\!\!\rightarrow\!\!#2}
+\newcommand{\sedge}[2]{#1\rightarrow#2}
+\newcommand{\sumno}{\sum\nolimits}
+\newcommand{\ns}[1]{\mbox{\normalsize $#1$}}
+
+\let\osetminus\setminus
+\renewcommand{\setminus}{\!\osetminus\!}
+\let\oin\in
+
+\renewcommand{\in}{\!\oin\!}
+
+\numberwithin{equation}{section}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\mino}{min}
+\DeclareMathOperator*{\maxo}{max}
+\DeclareMathOperator*{\erf}{erf}
+\DeclareMathOperator*{\forallo}{\Large\forall}
+\newcommand{\ie}{{\em i.e.}\ }
+\newcommand{\eg}{{\em e.g.}\ }
+\newtheorem{defn}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{cor}{Corollary}
+\newtheorem{prop}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newenvironment{proof}[1][]{\paragraph{Proof #1:}}{\hfill$\square$}
+\patchcmd{\thebibliography}{\section*{\refname}}{\section*{\refname}}{}{}
+\let\oabsname\abstractname
+\renewcommand{\abstractname}{\large{\oabsname}}
+
+\newenvironment{Itemize}{\vspace{-0.5\parskip}\begin{itemize}}{\end{itemize}}
+\newenvironment{Enumerate}{\vspace{-0.5\parskip}\begin{enumerate}}{\end{enumerate}}
+%\setlist*[itemize]{noitemsep, topsep=0pt}
+\setlist*[itemize]{itemsep=5pt, topsep=0pt}
+\setlist*[enumerate]{itemsep=5pt, topsep=0pt}
+
+%\definecolor{bggrey}{rgb}{0.95,0.95,0.95}
+\definecolor{bggrey}{rgb}{0.93,0.95,0.94}
+%\definecolor{bggrey}{rgb}{239,241,242}
+
+\lstdefinestyle{mystyle} {
+  framexleftmargin=2pt, %keeps numbers outside of frame
+  %framextopmargin=15pt,
+  %framexbottommargin=-15pt,
+  frame=tb,
+  framesep=7pt,
+  rulecolor=\color{bggrey},
+  backgroundcolor=\color{bggrey},
+  basicstyle=\ttfamily\scriptsize,
+  linewidth=1.0\textwidth,
+  numbers=left,
+  showlines=true,
+  numberblanklines=false,
+  stepnumber=1,
+  numbersep=5pt,
+  %numberstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  keepspaces=true,
+  mathescape=true,
+  escapeinside={(*@}{@*)}
+}
+
+\lstdefinestyle{mystyle1} {
+  %backgroundcolor=\color{bggrey},
+  %basicstyle=\ttfamily\scriptsize,
+  linewidth=0.5\textwidth,
+  numbers=none,
+  belowskip=-0.8 \baselineskip,
+  %breaklines=true,
+  %breakatwhitespace=true
+}
+\lstset{style=mystyle}
+
+% don't need the following. simply use defaults
+\setlength{\baselineskip}{16.0pt}    % 16 pt usual spacing between lines
+% Default margins are too wide all the way around.  I reset them here
+\setlength{\parskip}{2ex plus 2pt}
+\setlength{\parindent}{0pt}
+\setlength{\oddsidemargin}{.125in}
+%\setlength{\oddsidemargin}{0.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\marginparsep}{0.75cm}
+\setlength{\marginparwidth}{2.5cm}
+\setlength{\marginparpush}{1.0cm}
+\setlength{\textwidth}{6.25in}
+%\setlength{\textwidth}{150mm}
+\setlength{\textheight}{9in}
+\setlength{\topmargin}{-.5in}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{fpstyle}{ %define a style for fitst page
+  \fancyhf{}
+  \fancyfoot[L]{{\small\em Working Paper}}
+  %\fancyfoot[R]{{\small\em Confidential}}
+}
+\fancyhf{} %clear all header and footer fields
+\fancyfoot[L]{{\small\em Working Paper}}
+%\fancyfoot[R]{{\small\em Confidential}}
+\fancyfoot[C]{\thepage}
+                 
+\title{
+  \textsc{SABR Simulation for Risk Management}\\%\footnotemark
+  \large{\em{(Working Paper)}}
+}
+\author{Maged Tawfik%\footnotemark %\\
+%Citibank
+}
+\renewcommand{\today}{\vspace{-20pt}\it \small{January 12, 2026}}
+
+\begin{comment}
+\end{comment}
+
+\begin{document}
+\pagestyle{fancy}
+
+%\leftdisplays
+\maketitle
+\thispagestyle{fpstyle} % use if do not want page numbers
+%\pagestyle{empty} % all pages are not numbered
+\begin{center}
+\end{center}
+\footnotetext[1]{The opinions expressed in the paper are those of the author and do not necessarily reflect the view of Citibank.}
+\footnotetext[2]{email: maged.tawfik@citi.com}
+%\begin{abstract}
+%\input{liqNetflowAbstract_txt.tex}
+%\end{abstract}
+\section{Introduction}
+The SABR (Acronym for Stochastic alpha-beta-rho) model is a stochastic volatility model
+first studied by Hagan {\em et al}, 2002\cite{HKLW}.
+Due to its ability to replicate certain observed market phenomena, such as
+implied volatility smiles, frowns and skews, it has gained wide interest
+for the modeling of options.
+With its modeling power that can cover underlying assets that display normal, log-normal
+or CEV (Constant Elasticity of Variance) behavior,
+SABR is currently in extensive use in the area of fixed income derivatives.
+
+Formally, assuming a filtered probability space $(\Omega,\mathcal{F},\mathcal{F}_t,P)$,
+SABR is given by the following equations
+\beqn\label{eq:sabr}
+\begin{aligned}
+dF_t=\,&F_{t}^{\beta} \sigma_t dW_t\quad&\beta\in[0,1],\,F_0>0\\
+d\sigma_t =\,&\nu \sigma_t dZ_t&\nu\ge 0,\,\sigma_0>0\\
+[dZ_t,dW_t] =\,& \rho dt&\rho \in[-1,1]
+\end{aligned}
+\eeqn
+where $F_t, \sigma_t\in\mathcal{F}_t$, $[.,.]$ is the quadratic variation operator and
+$dW_t, dZ_t$ are standard Wiener increments.
+
+Pricing derivatives based on the SABR model is done using either a PDE (Partial Differential Equation)
+solver based on the two-dimensional discretization of the Kolmogorov backward equation,
+or a Monte Carlo simulation approach.
+PDE solvers tend to have much faster convergence.
+On the other hand, each run is effective in pricing a single option.
+Conversely, a set of Monte Carlo paths, once generated, can be used to price any number of
+derivatives as long as they share the same underlying asset and expiry date.
+This makes Monte Carlo simulation a more favorable approach in risk management,
+where risk measures associated with very large fixed income derivative portfolios need
+to be evaluated.
+
+\section{Difficulties in SABR Modeling}
+To properly simulate the SABR model, we need to counter two essential difficulties.
+To explain the first difficulty, we use the following discretized version of \eqref{eq:sabr}
+
+\beqn\label{eq:sabr_disc}
+\begin{aligned}
+    F_t - F_{t-\Delta t} = & \bar{F}_t^\beta \sigma_? W_{\Delta t}\\
+    \sigma_t - \sigma_{t-\Delta t} =&\nu \bar{\sigma}_t Z_{\Delta t}\\
+    [W_{\Delta t}, Z_{\Delta t}] = \rho \Delta t
+\end{aligned}
+\eeqn
+where $\bar{F}_t$ is an average value of $F_s$ between time $t-\Delta t$ and $t$,
+$\bar{\sigma}_t$ is an average value of $\sigma_s$ between time $t-\Delta t$ and $t$,
+and $\sigma_?$ is a representative value of $\sigma$ between $t-\Delta t$ and $t$.
+The difficulty in choosing an appropriate value $\sigma_?$, when $\nu>0$,
+stems from the fact
+that the continuous change of the value of $\sigma$ is accompanied by
+a continuous change in $F$ dependent on $\sigma$.
+Islah, 2009\cite{I}, showed that when $\beta \in \{0,1\}$ or when $\rho=0$,\,
+$\sigma_?$ can be exactly represented by the conditional average variance given as
+\beqn\label{eq:ith}
+\sigma_0\sqrt{\Delta t\;I_{t-\Delta t}^t(\sigma_t)}
+\eeqn
+where
+\beqn
+I_{t-\Delta t}^t(\sigma_t):=\frac{1}{\sigma_0^2\, \Delta t}\,
+\int_{t-\Delta t}^t \sigma_s^2\, ds \;\bigg|_{\sigma_t}
+\eeqn
+Choi {\em et al}, 2025\cite{CHK}, give the following equivalent functional
+\beqn
+I_{t-\Delta t}^t(\hat{Z}_1)\sim \int_0^1 \exp(2\nu\Delta t\, \hat{Z}_s)\,ds\,\big|_{\hat{Z}_1}
+\eeqn
+where $\hat{Z}_s\sim \mathcal{N}\left(-s\,\nu\sqrt{\Delta t}, \sqrt{s}\right)$.
+Although $I_{t-\Delta t}^t(\sigma_t)$ has a closed form pdf, as shown by
+Cai {\em et al}, 2017\cite{CSC}, there is no closed form for the cdf and
+its numerical integration is very difficult and highly error-prone.
+In their paper, Cai {\em et al} suggested the use of Laplace transform inversion
+to obtain an accurate and efficient representation of the cdf.
+We will be using a modified version of their Laplace inversion algorithm for the
+purposes of this paper.
+
+The second difficulty in simulating a SABR process,
+is that the proxy for $\sigma_?$ given by \eqref{eq:ith}
+is no longer valid.
+No other exact proxy is currently available.
+As a result, one has to resort to plausible approximations such as those presented in
+\cite{CSC}, \cite{CHK} and \cite{HKLW}.
+
+\section{Sampling the Average Variance}
+
+\section{Sampling the CEV Process}
+
+\section{Approximating the SABR Process}
+
+\section{Implied Volatility}
+
+\section{Asymptotic Representations}
+
+\section{Control Variable}
+
+\section{The Algorithm}
+
+\section{Results}
+
+\bigskip
+\begin{thebibliography}{99}
+    \bibitem{AW}
+        Abate, Joseph and Whitt, Ward, 2006, "A Unified Framework for Numerically Inverting Laplace Transforms".
+        doi:10.1287/ijoc.1050.0137
+    \bibitem{CHK}
+        Choi, Jaehyuk; Hu, Lilian and Kwok, Yue Kuen, 2025, "Efficient and Accurate Simulation of the Stochastic-alpha-beta-rho Model,"
+        arXiv:2408.01898v2
+    \bibitem{CKTW}
+        Choi, Jaehyuk; Kwak, Minsuk; Tee, Chyng Wen; and Wang, Yumeng, 2022, "A Black-Scholes user's guide to the
+        Bachelier model," {\em Journal of Futures Markets} 42(5):959-980. https://ink.library.smu.edu.sg/lkcsb\_research/6869
+    \bibitem{CSC}
+        Cai, Ning; Song, Yingda and Chen, Nan, 2017, "Exact Simulation of the SABR Model,"
+        {\em Operations Research} 65(4):931-951. doi:10.1287/opre.2017.1617
+    \bibitem{CW}
+        Choi, Jaehyuk and Wu, Lixin, 2020, "The equivalent constant-elasticity-of-variance (CEV) volatility
+        of the stochastic-alpha-beta-rho (SABR) model,"
+        arXiv:1911.13123v3
+    \bibitem{HKLW}
+        Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2002,
+        "Managing Smile Risk," {\em Wilmott} 1(2002):84-108.
+    \bibitem{I}
+        Islah, Othmane, 2009, “Solving SABR in Exact Form and Unifying It with LIBOR Market Model,”
+        SSRN eLibrary.
+        http://papers.ssrn.com/sol3/papers.cfm?astract-id=1489428 
+    \bibitem{MY}
+        Matsumoto, Hiroyuki and Yor, Marc, 2005, "Exponential functionals of Brownian motion, I: Probability
+        laws at fixed time," Probability Surveys Vol 2:312-347.
+        doi:10.1214/154957805100000159 
+\end{thebibliography}
+\end{document}
