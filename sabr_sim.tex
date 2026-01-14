@@ -65,6 +65,8 @@
 \DeclareMathOperator*{\mino}{min}
 \DeclareMathOperator*{\maxo}{max}
 \DeclareMathOperator*{\erf}{erf}
+\DeclareMathOperator*{\arcosh}{arcosh}
+\DeclareMathOperator*{\sgn}{sign}
 \DeclareMathOperator*{\forallo}{\Large\forall}
 \newcommand{\ie}{{\em i.e.}\ }
 \newcommand{\eg}{{\em e.g.}\ }
@@ -189,13 +191,14 @@ SABR is currently in extensive use in the area of fixed income derivatives.
 
 Formally, assuming a filtered probability space $(\Omega,\mathcal{F},\mathcal{F}_t,P)$,
 SABR is given by the following equations
-\beqn\label{eq:sabr}
-\begin{aligned}
-dF_t=\,&F_{t}^{\beta} \sigma_t dW_t\quad&\beta\in[0,1],\,F_0>0\\
-d\sigma_t =\,&\nu \sigma_t dZ_t&\nu\ge 0,\,\sigma_0>0\\
-[dZ_t,dW_t] =\,& \rho dt&\rho \in[-1,1]
-\end{aligned}
-\eeqn
+\begin{subequations}\label{eq:sabr}
+    \begin{align}
+        dF_t=\,&F_{t}^{\beta} \sigma_t dW_t\quad&\beta\in[0,1],\,F_0>0\label{eq:sabr_a}\\
+        d\sigma_t =\,&\nu \sigma_t dZ_t&\nu\ge 0,\,\sigma_0>0\label{eq:sabr_b}\\
+        [dZ_t,dW_t] =\,& \rho dt&\rho \in[-1,1]
+    \end{align}
+\end{subequations}
+
 where $F_t, \sigma_t\in\mathcal{F}_t$, $[.,.]$ is the quadratic variation operator and
 $dW_t, dZ_t$ are standard Wiener increments.
 
@@ -211,6 +214,7 @@ where risk measures associated with very large fixed income derivative portfolio
 to be evaluated.
 
 \section{Difficulties in SABR Modeling}
+\label{difficult}
 To properly simulate the SABR model, we need to counter two essential difficulties.
 To explain the first difficulty, we use the following discretized version of \eqref{eq:sabr}
 
@@ -243,11 +247,11 @@ Choi {\em et al}, 2025\cite{CHK}, give the following equivalent functional
 I_{t-\Delta t}^t(\hat{Z}_1)\sim \int_0^1 \exp(2\nu\Delta t\, \hat{Z}_s)\,ds\,\big|_{\hat{Z}_1}
 \eeqn
 where $\hat{Z}_s\sim \mathcal{N}\left(-s\,\nu\sqrt{\Delta t}, \sqrt{s}\right)$.
-Although $I_{t-\Delta t}^t(\sigma_t)$ has a closed form pdf, as shown by
-Cai {\em et al}, 2017\cite{CSC}, there is no closed form for the cdf and
+Although $I_{t-\Delta t}^t(\sigma_t)$ has a closed form PDF, as shown by
+Cai {\em et al}, 2017\cite{CSC}, there is no closed form for the CDF and
 its numerical integration is very difficult and highly error-prone.
 In their paper, Cai {\em et al} suggested the use of Laplace transform inversion
-to obtain an accurate and efficient representation of the cdf.
+to obtain an accurate and efficient representation of the CDF.
 We will be using a modified version of their Laplace inversion algorithm for the
 purposes of this paper.
 
@@ -258,13 +262,109 @@ No other exact proxy is currently available.
 As a result, one has to resort to plausible approximations such as those presented in
 \cite{CSC}, \cite{CHK} and \cite{HKLW}.
 
+\section{Sampling $\sigma_t$}
+In the process of simulating the SABR process, one may need to directly sample
+the volatility process itself.
+As per Equation \eqref{eq:sabr_b}, $\sigma_t$ follows a log-normal process.
+As a result, it can be sampled according to
+\beqn\label{eq:sig_sim}
+\begin{aligned}
+\sigma_t=&\sigma_0\,\exp(\nu\,\sqrt{t}\,\hat{Z}_t)\\
+\hat{Z}_t\sim&\mathcal{N}\left(-\half\nu\,\sqrt{t},\,1\right)\;.
+\end{aligned}
+\eeqn
+Thus, $\sigma_t$ is sampled {\em via} a single Gaussian variate.
+
 \section{Sampling the Average Variance}
+As explained in Section \ref{difficult}, the average volatility variance $I_0^t(\sigma_t)$
+is needed for the simulation of the price process.
+As discussed earlier, the sampling of $I_0^t(\sigma_t)$ is fraught with difficulty,
+due to the lack of a closed form representation of its CDF.
+For the sake of presentational simplicity, we may notationally drop the $\sigma_t$ dependency of
+$I_0^h$, in the remainder of the text, without changing the fact.
+
+In \cite{CHK}, Choi {\em et al} proposed an approach for the sampling of $I_0^t$
+by matching its CDF to that of shifted log-normal ($\mathcal{SLN}(\mu,\sigma^2,\lambda)$)
+process with matching
+first four moments.
+The $\mathcal{SLN}$ process is defined as
+\beqn
+\begin{split}
+Y\sim&\mathcal{SLN}(\mu,\sigma^2,\lambda) =\\
+Y\sim& \mu\left[(1-\lambda)+
+\lambda\exp(\sigma X-\frac{\sigma^2}{2})\right]\quad\quad\mu>0,\sigma>0,0<\lambda\le 1\,, 
+\end{split}
+\eeqn
+where $X$ is a standard Normal variate, where $\mu$ and $\sigma^2$ are the
+mean and variance of the LN process and $\lambda$
+is the shift parameter.
+In their work,
+Choi {\em et al} suggested setting $\lambda=\frac{5}{6}$ and sampling $I_0^t$
+according to
+\beqn\label{eq:choi_i}
+\begin{aligned}
+I_0^t\sim\mathcal{SLN}\left(\mu,\sigma^2,\frac{5}{6}\right)\\
+\sigma = \sqrt{\ln\left(1+\frac{36}{25}v^2\right)}\,,
+\end{aligned}
+\eeqn
+where $\mu$ and $v$ are drived from
+\beqn
+\begin{aligned}
+    \hat{Z}=&\,\frac{\ln(\sigma_t)-\ln(\sigma_0)}{\nu\sqrt{t}}\\
+    m_k(\hat{Z}) = &\,\frac{\Phi(\hat{Z}+k\nu\sqrt{t})-\Phi(\hat{Z}-k\nu\sqrt{t})}
+    {2k\nu\sqrt{t}\;\phi(\sqrt{\hat{Z}^2+k^2\nu^2t})}\\
+    c(\hat{Z})=&\,\half\left(\frac{\sigma_t}{\sigma_0}+\frac{\sigma_0}{\sigma_t}\right)\\
+    \mu = &\,\frac{\sigma_t}{\sigma_0}\,m_1(\hat{Z})\\
+    v=&\,\left(\frac{\sigma_t}{\sigma_0}\right)
+    \frac{\sqrt{m_2(\hat{Z})-c(\hat{Z})\,m_1(\hat{Z}})}{\mu\,\nu\sqrt{t}}
+    \,-\mu\,,
+\end{aligned}
+\eeqn
+where $\Phi(.)$ and $\phi(.)$ are standard normal CDF and PDF, respectively.
+Significant testing showed that while the approximation approach of \eqref{eq:choi_i}
+works reasonably well for $t$ less than three years,
+it tends to diverge for larger time steps.
+
+A more robust approach for the sampling of $I_0^t$ is the exact approach of Cai {\em et al} \cite{CSC},
+which is based on Laplace transform technique.
+In their paper they showed that the Laplace transform $L(\theta)$ of the CDF of $1/I_0^t$ is given by
+\beqn\label{eq:laplace}
+\begin{aligned}
+    L(\theta)=&\mathcal{L}(F_{1/I_0^t}(t))=\int_0^\infty F_{1/I_0^t}\,\exp(-\theta\,t)\,dt\\
+    L(\theta)=&\frac{1}{\theta}\,\exp\left\{\frac{[\ln(\sigma_t/\sigma_0)]^2-[\psi(\theta\nu^2/\sigma_0^2)]^2}{2\nu^2\,t}\right\}\\
+    \psi(x)=&\arcosh\left(\frac{x\sigma_0}{\sigma_t}+\half(\frac{\sigma_t}{\sigma_0}+\frac{\sigma_0}{\sigma_t})\right)\,.
+\end{aligned}
+\eeqn
+
+Several powerful numerical algorithms have been proposed in the literature for the
+inversion of Laplace transforms.
+We present here the Euler algorithm proposed by Abate and Whitt (2006) \cite{AW}
+for the inversion of \eqref{eq:laplace}, which reads
+
+\beqn\label{eq:euler}
+\begin{aligned}
+F_{1/I_0^t}(t) =&\frac{10^\frac{M}{3}}{t}\,\sum_{k=0}^{2M}\,(-1)^k\eta_k\;\Re\left(L(\frac{\beta_k}{t})\right)\\
+\beta_k=&\frac{1}{3}\,M \ln(10)\,+\,\pi i k\\
+\eta_0=&\frac{1}{2},\quad\quad\eta_k=1,\;\; 1\le k\le M\quad\quad\eta_{2M}=&2^{-M}\\
+\eta_{2M-k}=&\eta_{2M-k+1}\,+\,2^{-M}{M\choose k},\;\; 0<k<M\,,
+\end{aligned}
+\eeqn
+where $i=\sqrt{-1}$, $\Re(.)$ is the real part of a complex number
+and $M$ is chosen according to the desired level of accuracy.
+The number of correct significant digits is greater than $0.6M$,
+for well-behaved transforms.
+Notice that the CDF of $I_0^t$ is equal to $1-F_{1/I_0^t}$, since $I_0^t>0$,
+and hence, the relationship between the two is a bijection and
+\beqnn
+\sgn(\frac{d(1/I_0^t)}{dt})=-\sgn(\frac{dI_0^t}{dt})\,.
+\eeqnn.
 
 \section{Sampling the CEV Process}
 
 \section{Approximating the SABR Process}
 
 \section{Implied Volatility}
+
 
 \section{Asymptotic Representations}
 
