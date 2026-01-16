@@ -44,6 +44,7 @@
 \newcommand{\tinysize}[1]{\text{\tiny\ensuremath{#1}}}
 \newcommand{\eee}{\text{\large{\rm e}}}
 \newcommand{\E}{{\rm I\kern-.3em E}}
+\newcommand{\pr}{\mathbb{P}}
 \newcommand{\var}{{\rm Var}}
 \newcommand{\defas}{\overset{*}{=}}
 \newcommand{\sL}{{L}}
@@ -290,7 +291,7 @@ first four moments.
 The $\mathcal{SLN}$ process is defined as
 \beqn
 \begin{split}
-Y\sim&\mathcal{SLN}(\mu,\sigma^2,\lambda) =\\
+Y\sim&\mathcal{SLN}(\mu,\sigma^2,\lambda) :=\\
 Y\sim& \mu\left[(1-\lambda)+
 \lambda\exp(\sigma X-\frac{\sigma^2}{2})\right]\quad\quad\mu>0,\sigma>0,0<\lambda\le 1\,, 
 \end{split}
@@ -330,9 +331,9 @@ which is based on Laplace transform technique.
 In their paper they showed that the Laplace transform $L(\theta)$ of the CDF of $1/I_0^t$ is given by
 \beqn\label{eq:laplace}
 \begin{aligned}
-    L(\theta)=&\mathcal{L}(F_{1/I_0^t}(t))=\int_0^\infty F_{1/I_0^t}\,\exp(-\theta\,t)\,dt\\
-    L(\theta)=&\frac{1}{\theta}\,\exp\left\{\frac{[\ln(\sigma_t/\sigma_0)]^2-[\psi(\theta\nu^2/\sigma_0^2)]^2}{2\nu^2\,t}\right\}\\
-    \psi(x)=&\arcosh\left(\frac{x\sigma_0}{\sigma_t}+\half(\frac{\sigma_t}{\sigma_0}+\frac{\sigma_0}{\sigma_t})\right)\,.
+    L(\theta)=\,&\mathcal{L}(\theta;F_{1/I_0^t}(u))=\int_0^\infty F_{1/I_0^t}(u)\,\exp(-\theta\,u)\,du\\
+    L(\theta)=\,&\frac{\sigma_0^2t}{\theta}\,\exp\left\{\frac{[\ln(\sigma_t/\sigma_0)]^2-[\psi(\theta\nu^2/\sigma_0^2)]^2}{2\nu^2\,t}\right\}\\
+    \psi(x)=\,&\arcosh\left(\frac{x\sigma_0}{\sigma_t}+\half(\frac{\sigma_t}{\sigma_0}+\frac{\sigma_0}{\sigma_t})\right)\,.
 \end{aligned}
 \eeqn
 
@@ -343,10 +344,10 @@ for the inversion of \eqref{eq:laplace}, which reads
 
 \beqn\label{eq:euler}
 \begin{aligned}
-F_{1/I_0^t}(t) =&\frac{10^\frac{M}{3}}{t}\,\sum_{k=0}^{2M}\,(-1)^k\eta_k\;\Re\left(L(\frac{\beta_k}{t})\right)\\
-\beta_k=&\frac{1}{3}\,M \ln(10)\,+\,\pi i k\\
-\eta_0=&\frac{1}{2},\quad\quad\eta_k=1,\;\; 1\le k\le M\quad\quad\eta_{2M}=&2^{-M}\\
-\eta_{2M-k}=&\eta_{2M-k+1}\,+\,2^{-M}{M\choose k},\;\; 0<k<M\,,
+F_{1/I_0^t}(t) =\,&\frac{10^\frac{M}{3}}{t}\,\sum_{k=0}^{2M}\,(-1)^k\eta_k\;\Re\left(L(\frac{\beta_k}{t})\right)\\
+\beta_k=\,&\frac{1}{3}\,M \ln(10)\,+\,\pi i k\\
+\eta_0=\,&\frac{1}{2},\quad\quad\eta_k=1,\;\; 1\le k\le M\quad\quad\eta_{2M}=&2^{-M}\\
+\eta_{2M-k}=\,&\eta_{2M-k+1}\,+\,2^{-M}{M\choose k},\;\; 0<k<M\,,
 \end{aligned}
 \eeqn
 where $i=\sqrt{-1}$, $\Re(.)$ is the real part of a complex number
@@ -360,7 +361,75 @@ and hence, the relationship between the two is a bijection and
 \eeqnn.
 
 \section{Sampling the CEV Process}
+Since the SABR model is a stochastic volatility generalization of the Constant Elasticity of
+Variance (CEV) model, sampling CEV variates is usually a needed step in the SABR
+simulation.
+\begin{defn}[CEV]
+A CEV distribution which is denoted by
+\beqn
+F_t\sim\mathcal{CEV}_\beta(F_0,\sigma^2_0t)\,,
+\eeqn
+is the distribution of $F_t$, which follows the stochastic process
+\beqn
+dF_t = \sigma_0 F_t^\beta dW_t\quad \sigma\!\ge\! 0,\, F_0\!\ge\! 0,\, 0\!\le\!\beta\!\le\! 1\,,
+\eeqn
+where $dW_t$ is a standard Wiener process.
+\end{defn}
 
+Islah, 2009 \cite{I}, showed that a SABR model with $\rho=0$ is reducible to a CEV model by replacing
+$\sigma^2_0t$ by $I_0^t$, and that
+the CEV CDF follows the following probability law
+\beqn\label{eq:cev}
+\begin{aligned}
+\pr(F_t=0\big|F_0,\sigma_0,\sigma_t,I_0^t)=&\,1\,-\,Q_{\chi^2}\left(A_0;\frac{1}{1-\beta}\right)\\
+\pr(F_t\le u\big|F_0,\sigma_0,\sigma_t,I_0^t)=&\,1\,-\,Q_{\chi\prime^2}\left(A_0;\frac{1}{1-\beta};C_0(u)\right)
+\quad u>0\,,
+\end{aligned}
+\eeqn
+where
+\beqnn
+\begin{aligned}
+    A_0=&\,\frac{1}{I_0^t}\left(\frac{F_0^{1-\beta}}{1-\beta}\right)^2\,\text{and}\\
+    C_0(u)=&\,\frac{1}{I_0^t}\left(\frac{u^{1-\beta}}{1-\beta}\right)^2\,,
+\end{aligned}
+\eeqnn
+and where $\chi^2(\delta)$ is the chi-squared distribution
+with $\delta$ degrees of freedom, and
+$\chi\prime^2(\delta,\gamma)$ is the non-central chi-squared distribution
+with $\delta$ degrees of freedom and $\gamma$ non-centrality parameter.
+The sampling of $F_t$ requires the numerical inversion of Equation
+\eqref{eq:cev}, a process fraught with difficulty due
+to wide range of the parameters involved which
+lead to high degree of numerical instability.
+
+A novel approach proposed by Choi {\em et al}, \cite{CHK} based on the
+work of Makarov and Glew \cite{MG} and Kang \cite{K}
+allows for the direct sampling of a CEV variate through the
+drawing of two gamma samples and one Poisson sample.
+Using their approach, we define
+\beqnn
+\begin{aligned}
+    z_t:=&\,z(F_t)\\
+    z(y):=&\,\frac{u^{2(1-\beta)}}{(1-\beta)^2\sigma_0^2tI_0^t}\,.
+\end{aligned}
+\eeqnn
+A sample of $z_t$ can be drawn according to
+\beqn
+\begin{aligned}
+    Z_t\sim&\, 2\mathcal{G}(N+1)\\
+    N\sim&\, \mathcal{POIS}(\frac{z_0}{2} - \,X)\\
+    X\sim&\, \mathcal{G}\left(\frac{1}{2(1-\beta)}\right)\\
+    F_t=&
+    \begin{cases}
+        0\quad\quad X\ge 0.5\,z_0\\
+        \left(\sigma_0(1-\beta)\sqrt{t\,Z_t\,I_0^t}\right)^\frac{1}{1-\beta}
+        \quad \quad X<0.5\,z_0\,,
+    \end{cases}
+\end{aligned}
+\eeqn
+where $\mathcal{G}(\alpha)$ is the gamma distribution with shape parameter
+$\alpha$ and unit scale parameter, and
+$\mathcal{POIS}(\lambda)$ is the Poisson distribution with intensity $\lambda$.
 \section{Approximating the SABR Process}
 
 \section{Implied Volatility}
@@ -389,8 +458,8 @@ and hence, the relationship between the two is a bijection and
         Cai, Ning; Song, Yingda and Chen, Nan, 2017, "Exact Simulation of the SABR Model,"
         {\em Operations Research} 65(4):931-951. doi:10.1287/opre.2017.1617
     \bibitem{CW}
-        Choi, Jaehyuk and Wu, Lixin, 2020, "The equivalent constant-elasticity-of-variance (CEV) volatility
-        of the stochastic-alpha-beta-rho (SABR) model,"
+        Choi, Jaehyuk and Wu, Lixin, 2020, "The Equivalent Constant-elasticity-of-variance (CEV) Volatility
+        of the Stochastic-Alpha-Beta-Rho (SABR) Model,"
         arXiv:1911.13123v3
     \bibitem{HKLW}
         Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2002,
@@ -398,10 +467,18 @@ and hence, the relationship between the two is a bijection and
     \bibitem{I}
         Islah, Othmane, 2009, “Solving SABR in Exact Form and Unifying It with LIBOR Market Model,”
         SSRN eLibrary.
-        http://papers.ssrn.com/sol3/papers.cfm?astract-id=1489428 
+        http://papers.ssrn.com/sol3/papers.cfm?astract-id=1489428
+    \bibitem{K}
+        Kang, C., 2014, "Simulation of the Shifted Poisson Distribution with an Application
+        to the CEV Model," {Management Science and Financial Engineering}, 20:27-32.
+        doi:10.7737/MSFE.2014.20.1.027
+    \bibitem{MG}
+        Makarov, R.N. and Glew, D., 2010, "Exact Simulation of Bessel Diffusions,"
+        {\em Monte Carlo Methods and Applications} 16:312-347.
+        doi:10.1515/mcma.2010.010. arXiv:0910.4177
     \bibitem{MY}
         Matsumoto, Hiroyuki and Yor, Marc, 2005, "Exponential functionals of Brownian motion, I: Probability
-        laws at fixed time," Probability Surveys Vol 2:312-347.
+        laws at fixed time," {\em Probability Surveys} 2:312-347.
         doi:10.1214/154957805100000159 
 \end{thebibliography}
 \end{document}
