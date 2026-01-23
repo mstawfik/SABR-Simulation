@@ -215,7 +215,7 @@ where risk measures associated with very large fixed income derivative portfolio
 to be evaluated.
 
 \section{Difficulties in SABR Modeling}
-\label{difficult}
+\label{sec:diff}
 To properly simulate the SABR model, we need to counter two essential difficulties.
 To explain the first difficulty, we use the following discretized version of \eqref{eq:sabr}
 
@@ -261,12 +261,12 @@ is that the proxy for $\sigma_?$ given by \eqref{eq:ith}
 is no longer valid.
 No other exact proxy is currently available.
 As a result, one has to resort to plausible approximations such as those presented in
-\cite{CSC}, \cite{CHK} and \cite{HKLW}.
+\cite{CSC},\cite{CHK} and\cite{HKLW}.
 
 \section{Sampling $\sigma_t$}
 In the process of simulating the SABR process, one may need to directly sample
 the volatility process itself.
-As per Equation \eqref{eq:sabr_b}, $\sigma_t$ follows a log-normal process.
+As per Equation~\eqref{eq:sabr_b}, $\sigma_t$ follows a log-normal process.
 As a result, it can be sampled according to
 \beqn\label{eq:sig_sim}
 \begin{aligned}
@@ -277,14 +277,14 @@ As a result, it can be sampled according to
 Thus, $\sigma_t$ is sampled {\em via} a single Gaussian variate.
 
 \section{Sampling the Average Variance}
-As explained in Section \ref{difficult}, the average volatility variance $I_0^t(\sigma_t)$
+As explained in Section~\ref{sec:diff}, the average volatility variance $I_0^t(\sigma_t)$
 is needed for the simulation of the price process.
 As discussed earlier, the sampling of $I_0^t(\sigma_t)$ is fraught with difficulty,
 due to the lack of a closed form representation of its CDF.
 For the sake of presentational simplicity, we may notationally drop the $\sigma_t$ dependency of
 $I_0^h$, in the remainder of the text, without changing the fact.
 
-In \cite{CHK}, Choi {\em et al} proposed an approach for the sampling of $I_0^t$
+In\cite{CHK}, Choi {\em et al} proposed an approach for the sampling of $I_0^t$
 by matching its CDF to that of shifted log-normal ($\mathcal{SLN}(\mu,\sigma^2,\lambda)$)
 process with matching
 first four moments.
@@ -326,7 +326,7 @@ Significant testing showed that while the approximation approach of \eqref{eq:ch
 works reasonably well for $t$ less than three years,
 it tends to diverge for larger time steps.
 
-A more robust approach for the sampling of $I_0^t$ is the exact approach of Cai {\em et al} \cite{CSC},
+A more robust approach for the sampling of $I_0^t$ is the exact approach of Cai {\em et al}\cite{CSC},
 which is based on Laplace transform technique.
 In their paper they showed that the Laplace transform $L(\theta)$ of the CDF of $1/I_0^t$ is given by
 \beqn\label{eq:laplace}
@@ -339,7 +339,7 @@ In their paper they showed that the Laplace transform $L(\theta)$ of the CDF of 
 
 Several powerful numerical algorithms have been proposed in the literature for the
 inversion of Laplace transforms.
-We present here the Euler algorithm proposed by Abate and Whitt (2006) \cite{AW}
+We present here the Euler algorithm proposed by Abate and Whitt (2006)\cite{AW}
 for the inversion of \eqref{eq:laplace}, which reads
 
 \beqn\label{eq:euler}
@@ -360,7 +360,7 @@ and hence, the relationship between the two is a bijection and
 \sgn(\frac{d(1/I_0^t)}{dt})=-\sgn(\frac{dI_0^t}{dt})\,.
 \eeqnn.
 
-\section{Sampling the CEV Process}
+\section{Sampling the CEV Process}\label{sec:cev}
 Since the SABR model is a stochastic volatility generalization of the Constant Elasticity of
 Variance (CEV) model, sampling CEV variates is usually a needed step in the SABR
 simulation.
@@ -376,7 +376,7 @@ dF_t = \sigma_0 F_t^\beta dW_t\quad \sigma\!\ge\! 0,\, F_0\!\ge\! 0,\, 0\!\le\!\
 where $dW_t$ is a standard Wiener process.
 \end{defn}
 
-Islah, 2009 \cite{I}, showed that a SABR model with $\rho=0$ is reducible to a CEV model by replacing
+Islah, 2009\cite{I}, showed that a SABR model with $\rho=0$ is reducible to a CEV model by replacing
 $\sigma^2_0t$ by $I_0^t$, and that
 the CEV CDF follows the following probability law
 \beqn\label{eq:cev}
@@ -402,8 +402,8 @@ The sampling of $F_t$ requires the numerical inversion of Equation
 to wide range of the parameters involved which
 lead to high degree of numerical instability.
 
-A novel approach proposed by Choi {\em et al}, \cite{CHK} based on the
-work of Makarov and Glew \cite{MG} and Kang \cite{K}
+A novel approach proposed by Choi {\em et al},\cite{CHK} based on the
+work of Makarov and Glew\cite{MG} and Kang\cite{K}
 allows for the direct sampling of a CEV variate through the
 drawing of two gamma samples and one Poisson sample.
 Using their approach, we define
@@ -430,10 +430,76 @@ A sample of $z_t$ can be drawn according to
 where $\mathcal{G}(\alpha)$ is the gamma distribution with shape parameter
 $\alpha$ and unit scale parameter, and
 $\mathcal{POIS}(\lambda)$ is the Poisson distribution with intensity $\lambda$.
+
 \section{Approximating the SABR Process}
+As already mentioned in Section~\ref{sec:diff}, the SABR process can be
+reduced to a CEV process, with $\sigma_0\sqrt{t\,I_0^t}$ playing the
+r\^ole of $\sigma_t$, whenever $\rho=0$.
+As of the time of this writing, however, there is no known analytic expression
+of the general case of SABR dynamics with $\rho\ne 0$.
+In this section we present an approximation,
+based on an operator splitting technique,
+as suggested by Choi {em et al}\cite{CHK}.
+According to this approach we rewrite Equation~\eqref{eq:sabr} as
+\beqn\label{eq:sabr1}
+\frac{dF_t}{F_t^\beta}=\,\sigma_t\,(\rho\,dZ_t \,+\,\sqrt{1-\rho^2}\,dZ_t^\perp)\quad
+\text{and}\quad\frac{d\sigma_t}{\sigma_t}=\,\nu\,dZ_t\,,
+\eeqn
+where $dZ_t$ and $dZ_t^\perp$ are uncorrelated Wiener increments.
+Applying the operator splitting technique Equation~\eqref{eq:sabr1} becomes
+\begin{subequations}
+\begin{align}
+\frac{dF_t^{(1)}}{[F_t^{(1)}]^\beta}=&\,\rho\,\sigma_t\,dZ_t\;\quad\text{and}\;\quad
+\frac{d\sigma_t}{\sigma_t}=\nu\,dZ_t\label{eq:sabr2a}\\
+\frac{dF_t^{(2)}}{[F_t^{(2)}]^\beta}=&\,\sqrt{1-\rho^2}\,\sigma_t\,dZ_t^\perp\;\quad\text{and}\quad
+\;\frac{d\sigma_t}{\sigma_t}=\nu\,dZ_t\label{eq:sabr2b}\,.
+\end{align}
+\end{subequations}
+
+The operator splitting technique approximates the solution $F_t$ of \eqref{eq:sabr1},
+with initial condition $F_0$,
+by $F_t\!\approx\!\! F_t^{(2)}\!\left(F_t^{(1)}(F_0)\right)$, where
+$F_t^{(1)}(F_0)$ is the solution $F_0^{(1)}$ of \eqref{eq:sabr2a},
+with initial condition $F_0^{(1)}\!\!=\!\!F_0\,$,
+and $\,F_t^{(2)}(F_t^{(1)}(F_0))\,$ is the solution $F_t^{(2)}$ of Equation~\eqref{eq:sabr2b},
+with initial condition $F_0^{(2)}\!=\!F_t^{(1)}(F_0)$.
+
+According to Section~\ref{sec:diff}, Equation~\eqref{eq:sabr2b} which obeys the
+SABR dynamics with zero correlation, is essentially a CEV process whose solution is
+\beqn
+F_t^{(2)}|\sigma_t,I_0^t\sim \mathcal{CEV}_\beta\left(F_0^{(2)},(1-\rho^2)\sigma_0^2 tI_0^t\,\right)\,.
+\eeqn 
+
+This leaves us with Equation~\eqref{eq:sabr2a}, which has no known analytic solution.
+Choi {em et al}\cite{CHK} suggested a frozen coefficient approximation in which
+they approximated $[F_t^{(1)}]^{(1-\beta)}$ by $F_0^{(1-\beta)}$,
+accordingly,
+
+\beqn\label{eq:approx}
+\begin{aligned}
+\frac{dF_t^{(1)}}{F_t^{(1)}}=&\,\frac{\rho\sigma_t}{[F_t^{(1)}]^{(1-\beta)}}\,dZ_t\\
+\approx&\,\frac{\rho\sigma_t}{F_0^{(1-\beta)}}\,dZ_t\,.
+\end{aligned}
+\eeqn
+
+The solution $\tilde{F}_t^{(1)}$ of Equation~\eqref{eq:approx} is
+
+\beqn
+\tilde{F}_t^{(1)}(F_0)=F_0\,\exp\left(\frac{\rho}{\nu F_0^{(1-\beta)}}(\sigma_t - \sigma_0) - 
+\frac{\rho^2\sigma_0^2 t I_0^t}{2F_0^{2(1-\beta)}}\right)\,.
+\eeqn
+
+Finally, conditional on $\sigma_t$ and $I_0^t$, the CEV approximation of the general
+SABR process results in a terminal forward price $F_t$ according to
+
+\beqn
+F_t|\,\sigma_t,I_0^t\sim\,\mathcal{CEV}\left(\tilde{F}_t^{(1)},\,(1-\rho^2)\sigma_0^2\, t\, I_0^t\right)
+\eeqn
+As is the case with almost all approximation approaches of this nature,
+the accuracy of the final result increases in inverse proportion to
+the time step $t$.
 
 \section{Implied Volatility}
-
 
 \section{Asymptotic Representations}
 
