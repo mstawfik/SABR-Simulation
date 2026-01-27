@@ -432,6 +432,7 @@ $\alpha$ and unit scale parameter, and
 $\mathcal{POIS}(\lambda)$ is the Poisson distribution with intensity $\lambda$.
 
 \section{Approximating the SABR Process}
+\label{sec:approx}
 As already mentioned in Section~\ref{sec:diff}, the SABR process can be
 reduced to a CEV process, with $\sigma_0\sqrt{t\,I_0^t}$ playing the
 r\^ole of $\sigma_t$, whenever $\rho=0$.
@@ -450,7 +451,7 @@ Applying the operator splitting technique Equation~\eqref{eq:sabr1} becomes
 \begin{subequations}
 \begin{align}
 \frac{dF_t^{(1)}}{[F_t^{(1)}]^\beta}=&\,\rho\,\sigma_t\,dZ_t\;\quad\text{and}\;\quad
-\frac{d\sigma_t}{\sigma_t}=\nu\,dZ_t\label{eq:sabr2a}\\
+\frac{d\sigma_t}{\sigma_t}=\nu\,dZ_t\label{eq:sabr2a}\\[5pt]
 \frac{dF_t^{(2)}}{[F_t^{(2)}]^\beta}=&\,\sqrt{1-\rho^2}\,\sigma_t\,dZ_t^\perp\;\quad\text{and}\quad
 \;\frac{d\sigma_t}{\sigma_t}=\nu\,dZ_t\label{eq:sabr2b}\,.
 \end{align}
@@ -477,7 +478,7 @@ accordingly,
 
 \beqn\label{eq:approx}
 \begin{aligned}
-\frac{dF_t^{(1)}}{F_t^{(1)}}=&\,\frac{\rho\sigma_t}{[F_t^{(1)}]^{(1-\beta)}}\,dZ_t\\
+\frac{dF_t^{(1)}}{F_t^{(1)}}=&\,\frac{\rho\sigma_t}{[F_t^{(1)}]^{(1-\beta)}}\,dZ_t\\[5pt]
 \approx&\,\frac{\rho\sigma_t}{F_0^{(1-\beta)}}\,dZ_t\,.
 \end{aligned}
 \eeqn
@@ -500,14 +501,235 @@ the accuracy of the final result increases in inverse proportion to
 the time step $t$.
 
 \section{Implied Volatility}
+Given an option pricing model, the {\em implied
+volatility} is a value, reflective of the variance of the stochastic process,
+that, when plugged into the model, gives the observed option price.
+Derivatives traders prefer implied volatility as a price quotation mechanism.
+This is due to the fact that it can provide stable option quotation that
+does not need to change with every  movement of the underlying.
+Moreover, implied volatility reveals the nature of option prices as
+a function of option strike---generally referred to as the volatility smile.
+
+Let $B(\sigma;u,k,\tau)$ be the price of an option of strike $k$, on an underlying
+of forward price $u$ and price volatility $\sigma$,
+and which expires at time $\tau$.
+Given a specific tuple $(v,u_0,k,\tau)$,
+where $v$ the price of the option at time $t=0$,
+the implied volatility of the option is
+\begin{subequations}
+\beqn
+\sigma^{imp} = V(v;u_0,k,\tau)\,,
+\eeqn
+that satisfies
+\beqn
+B(V(v;u_0,k,\tau);u,k,\tau)=v\,,
+\eeqn
+\end{subequations}
+\ie, $V(.)=B(.)^{-1}$.
+
+
+When the dynamics of the underlying are believed to be governed by a
+geometric Brownian motion, the pricing model is log-normal and the
+implied volatility is often referred to as the Black
+or Black-Scholes volatility, $\sigma^{BS}$.
+For instance, in the case of a call option,
+$\sigma{BS}$ can be obtained from 
+
+\beqn
+%\begin{aligned}
+B(\sigma;u_0,k,\tau)=u_0\,N(d_1)\,-\,k\,N(d2)\quad\quad\text{with}\quad\quad
+d_{1,2}=\frac{\log(u_0/k)}{\sigma^{BS}\sqrt{\tau}}
+\pm \frac{\sigma^{BS}\sqrt{\tau}}{2}\,,
+%\end{aligned}
+\eeqn
+where $N(.)$ is the CDF of the standard Gaussian distribution.
+
+Similarly, when the dynamics are Gaussian in nature, the 
+pricing model is Bachelier and the implied volatility is known as the
+normal volatility, $\sigma^{N}$, which
+in the case of a call option should satisfy
+
+\beqn
+B(\sigma;u_0,k,\tau)=(u_0-k)\,N(d_N)\,+\,\sigma^{N}\sqrt{\tau}\,n(d_N)\quad\quad
+\text{with}\quad\quad d_n=\frac{u_0\,-\,k}{\sigma^N\sqrt{\tau}}\,,
+\eeqn
+where $n(.)$ is the PDF of the standard Gaussian distribution.
+
+More relevant to the SABR model is the notion of the CEV implied volatility,
+$\sigma^{CEV}$,
+which is the volatility associated with the constant elasticity of variance
+model.
+In the case of a call option, $\sigma^{CEV}$ obeys (see \cite{CW})
+
+\beqn
+\begin{aligned}
+B(\sigma;u_0,k,\tau)=&\,\bar{F}_{\chi^2}\left(\frac{k^{2\beta_*}}{[\sigma^{CEV}\beta_*]^2\,\tau};
+2+\frac{1}{\beta_*},\frac{1}{[\sigma^{CEV}\beta_*]^2\,\tau}\right)\,-\\[5pt]
+&k\,
+F_{\chi^2}\left(\frac{1}{[\sigma^{CEV}\beta_*]^2\,\tau};
+\frac{1}{\beta_*},\frac{k^{2\beta_*}}{[\sigma^{CEV}\beta_*]^2\,\tau}\right)\,,
+\end{aligned}
+\eeqn
+where $\beta_*\!=\!1\!-\!\beta$, $\,\bar{F}_{\chi^2}(.)\!=\!1-\!F_{\chi^2}(.)$ and
+$F_{\chi^2}(x;r;x_0)$ is CDF of the non-central chi-squared distribution 
+of $r$ degrees of freedom and $x_0$ non-centrality parameter.
+
+It goes without saying that any implied volatility can be converted to
+any other implied volatility.
+This is done by plugging the given implied volatility into the
+corresponding option pricing model.
+Once the option price is obtained, it can be used to obtain the
+desired implied volatility by, usually numerically, solving the
+relevant inverse pricing model $B^{-1}(.)$.
 
 \section{Asymptotic Representations}
+Since deriving closed form analytic formulas for derivatives pricing is,
+most of the time, impossible or impractical,
+a significant amount of research effort has been directed towards
+finding effective semi-analytic approximations.
+These are usually formulas for expressing implied volatility in terms
+of model parameters.
+In this section, we focus on semi-analytic representations of the SABR model.
+All formulas presented in this section will use the following
+normalized quantities,
+
+\beqn
+\begin{aligned}
+    f_t =&\frac{F_t}{F_0}\quad(f_0=1)&&k=\frac{K}{F_0}\\
+    \hat{\sigma}_t=&\frac{\sigma_t}{\sigma_0}\quad(\hat{\sigma}_0=1)&&
+    \alpha = \frac{\sigma_0}{F_0^{\beta_*}}\,,
+\end{aligned}
+\eeqn
+where $K$ is the option strike price.
+We will denote option expiry by $T$.
+
+\subsection{Hagan {\em et al}'s (HKLW) Formula}
+The Hagan approximation (2002)\cite{HKLW} is one of the most widely used
+semi-analytic approximations of the SABR model.
+It is very effective near the money and for small times to maturity.
+Hagan {\em et all} presented $O(T)$ approximations for both the normal and the
+Black-Scholes volatilities.
+Their normal approximation is more accurate.
+In a later paper, Hagan {\em el al} (2014)\cite{HKLW1},
+derived a modified more accurate version of their earlier approximation.
+In the modified Hagan model, the normal implied volatility of the SABR model
+is given by the following chain of definitions:
+
+\beqn\label{eq:hklw}
+\begin{aligned}
+\sigma^N=&\alpha\,\frac{q_N}{q}\,H(z)\,(1\,+\,h_N\,T),\quad\quad
+z=\frac{\nu}{\alpha}\,q\\
+q=&\,\int_1^kk^{-\beta}\,dk=
+\begin{cases}
+    \frac{k^{\beta_*}-1}{\beta_*}\quad\text{if}\quad 0\le\beta<1\\
+    \log k\quad\text{if}\quad \beta=1
+\end{cases}\\
+q_N=&k-1\quad\quad(z_N=\frac{\nu}{\alpha}\,q_N)\\
+H(z)=&\,\frac{z}{x(z)},\quad x(z)=\,\log\left(\frac{V(z)+z+\rho}{1+\rho}\right),
+\quad V(x)=\sqrt{1+2\rho z+z^2}\\[5pt]
+h_N=&\,\log\left(k^{\beta/2}\frac{q}{q_N}\right)\frac{\alpha^2}{q^2}\,+\,
+\frac{\rho}{4}\frac{k^\beta-1}{k-1}\alpha \nu \,+\,
+\frac{2-3\rho^2}{24}\nu^2\,.
+\end{aligned}
+\eeqn
+
+There are three special cases concerning Equation~\eqref{eq:hklw}.
+First, when $z\!=\!0\,$, $H(z)\,$ converges to $1$.
+Secondly, when $\rho\!=\!0\,$, $H(z)\,$ simplifies to $H(z)\!=\!z/arcsinh(z)$.
+Finally, the third case is the case of $\rho\!=\!-1\,$.
+In such a case,
+the value of $H(z)$ becomes
+\beqn
+H(z)=
+\begin{cases}
+    0\quad\quad\text{if}\quad z=0\\
+    \infty\quad\quad\text{otherwise}\,.
+\end{cases}
+\eeqn
+
+\subsection{Choi and Wu's CEV Formula}
+In 2021 Choi and Wu\cite{CW} presented a powerful formula for the
+approximation of $\sigma^{CEV}$, based on
+Paulot's (2015) work\cite{P}.
+This formula is better at handling out of the money options,
+large initial volatility and large vol-of-vol.
+
+\section{Implied Volatility Surface}
+Let $\mathbb{D}$ be defined as
+\beqn
+\mathbb{D}=(0,\infty)\times[0,1]\times[-1,1]\times[0,\infty)\quad\quad
+x\in\mathbb{D}=(\sigma,\beta,\rho,\nu)\,,
+\eeqn
+where $\sigma,\beta, \rho, \nu$ are the SABR parameters
+associated with an option on a forward contract
+of tenor $t$ and which expires at time $\tau$.
+Also, let the functions $\hat{S}, \hat{T}$ be defined according to
+\beqn
+\begin{aligned}
+    \hat{S}:&\;I_1\times I_2\longrightarrow \,\mathbb{D}\\
+    \hat{S}:&\;(i,j)\mapsto (\sigma_{ij},\beta_{i,j},\rho_{i,j},\nu_{i,j})\\
+    \hat{T}:&\;I_1\times I_2\longrightarrow \;\mathbb{R}^+\!\times\mathbb{R}^+\\
+    \hat{T}:&\;(i,j)\mapsto (t_i,\tau_j)\,
+\end{aligned}
+\eeqn
+where, $I_1$ and $I_2$ are two finite ordered index sets.
+Now, we define the implied volatility surface as the function
+$S_h(t,\tau;\hat{T}^{-1},\hat{S}):\mathbb{R}^+\!\times\!\mathbb{R}^+\rightarrow \mathbb{D}\;$
+for all $(t,\tau)\in \mathbb{R}^+\!\times\mathbb{R}^+$,
+where $h$ is the valuation date, which can be in the future.
+In other words, the volatility surface is a function that maps
+any tenor-expiry combination into a set of SABR parameters by interpolating
+the set of parameters given for a select finite set of options.
+Typically, the set of given parameters forms a grid pattern, \ie
+$\hat{S}$ is surjective.
+
+In order for the volatility surface, $S_h$, to be useful in proving a price
+for an option, it has to be accompanied by a price $F_h(t)$ for
+the underlying forward contract of tenor $t$.
+In case of the SABR model, $F_h$ and $S_h$ are simulated together due to
+their coupled processes.
+
 
 \section{Control Variable}
+It is not uncommon in a risk management scenario for the set $I_1\times I_2$
+to have a size in the hundreds.
+Estimating portfolio risk requires the simulation of the volatility surface over
+hundreds of forward horizons.
+It is not hard to see how the computational complexity grows very rapidly.
+As a result, each simulation of the volatility surface has to be
+limited to a number of paths that is far less than that which
+needed for accurate simulation of an option price.
+To alleviate that deficiency, we resort to a technique know as the
+{\em control variable} technique as a means of variance reduction and,
+consequently, accuracy improvement.
+
+Our control variable approach uses the prices of four control options
+struck at different strikes, for every node on the implied volatility
+grid and for every simulation horizon, to adjust the distribution
+of the forward price $F_h$ of the simulated sample paths.
+The philosophy behind this stems from the fact that the
+true forward price distribution can be ascertained from 
+the option prices of options struck at different strikes.
+Given a forward price $F_0(t)$ and an implied volatility
+set $S_0(t,\tau)$, one can accurately price options of various strikes
+that share the tenor $t$ and the expiry $h$.
+This is usually done using a semi-analytic technique, such as those
+discussed in Section~\ref{sec:approx},
+additional Monte Carlo simulation or a partial differential equation (PDE)
+solver such as the finite difference method (FDM).
+Once the option prices are obtained, we compare their values
+with those predictable by our simulation.
+The discrepancy, is then, corrected by proportionately
+adjusting the values of $F_h$
+of the simulation paths.
 
 \section{The Algorithm}
 
+\section{Negative Rates}
+
 \section{Results}
+
+\section{PCA Complexity Reduction}
 
 \bigskip
 \begin{thebibliography}{99}
@@ -530,6 +752,9 @@ the time step $t$.
     \bibitem{HKLW}
         Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2002,
         "Managing Smile Risk," {\em Wilmott} 1(2002):84-108.
+    \bibitem{HKLW1}
+        Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2014,
+        "Arbitrage-Free SABR," {\em Wilmott} (2014):60-75. doi:10.1002/wilm.10290
     \bibitem{I}
         Islah, Othmane, 2009, “Solving SABR in Exact Form and Unifying It with LIBOR Market Model,”
         SSRN eLibrary.
@@ -546,5 +771,13 @@ the time step $t$.
         Matsumoto, Hiroyuki and Yor, Marc, 2005, "Exponential functionals of Brownian motion, I: Probability
         laws at fixed time," {\em Probability Surveys} 2:312-347.
         doi:10.1214/154957805100000159 
+    \bibitem{P}
+    Paulot, Louis, 2015, "Asymptotic Implied Volatility at the Second Order with
+    Application to the SABR Model," In: Friz, P., Gatheral, J., Gulisashvili,
+    A., Jacquier, A., Teichmann, J. (eds) {\em
+    Large Deviations and Asymptotic Methods in Finance}.
+    Springer Proceedings in Mathematics \& Statistics, (110)
+    Springer, Cham. https://doi.org/10.1007/978-3-319-11605-1\_2
+    arXiv:0906.0658v3
 \end{thebibliography}
 \end{document}
