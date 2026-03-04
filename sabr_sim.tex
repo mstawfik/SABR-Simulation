@@ -533,7 +533,7 @@ geometric Brownian motion, the pricing model is log-normal and the
 implied volatility is often referred to as the Black
 or Black-Scholes volatility, $\sigma^{BS}$.
 For instance, in the case of a call option,
-$\sigma{BS}$ can be obtained from 
+$\sigma^{BS}$ can be obtained from 
 
 \beqn
 %\begin{aligned}
@@ -654,6 +654,174 @@ Paulot's (2015) work\cite{P}.
 This formula is better at handling out of the money options,
 large initial volatility and large vol-of-vol.
 
+\section{Option Portfolio}
+In the preceding sections we developed a framework for simulating
+the correlated movement of forward prices and volatilities at
+future time horizons.
+Such framework is useful for pricing options written at time $t_0$ 
+with expiry that
+matches any of the simulation horizon.
+This assumes that the starting values of $\sigma, \nu, \rho, \beta\,$
+are known at time $t_0$ and either, remain constant, or are
+given as known function in time.
+Moreover, options written on different tenors of the same
+interest rate curve have to reflect the stochastic dependence
+of the forward prices of the various tenors.
+Otherwise, simulation results may be totally unrealistic or even non-arbitrage-free.
+In this section we will address these two issues.
+
+\subsection{Forward Swap Volatility}
+Let us start by assuming the following risk neutral dynamics for the instantaneous forward rate $f(t,T)$,
+which is the rate at time $T$ as observed at time $t$,
+
+\beqn\label{eq:forwards}
+\begin{aligned}
+df(t,T)=&\,\sum_{i=1}^n\,\sigma_i(t,T)\,\bar{\sigma}_i(t,T)\,dt\,+\,\sum_{i=1}^n\,\sigma_i(t,T)\,dW_i(t)\\
+\bar{\sigma}_i(t,T)=&\,\int_t^T\,\sigma_i(t,u)\,du\,,
+\end{aligned}
+\eeqn
+where $dW_i(t)$ are $n$ standard uncorrelated Wiener increments.
+
+Employing Ito's lemma and the arguments of HJM (see~\cite{HJM}), we get
+\beqn
+\frac{dP(t,T)}{P(t,T)}=\,r(t)\,dt \,-
+\,\sum_{i=1}^n\,\bar{\sigma}_i(t,T)\,dW_i(t)\,,
+\eeqn
+where $r(t)=f(t,t)$.
+
+The interest rate forward swap rate $S(t_x,t_s,t_e)$ is the coupon rate of the
+fixed leg of the swap, which is an $\mathcal{F}_t$-martingale under the annuity measure.
+The parameters $t_s\,$, $t_e\,$ are the start and end dates of the swap, respectively,
+and $t_x$ is the rate set date.
+Let the swap-corresponding annuity be defined as
+\beqn
+A(t)=\sum_{i=0}^n\,\pi_i\,P(t,T_i)\qquad t\le t_s\,,
+\eeqn
+where $n$ is the number of payments, $T_i$ is the $i$-th payment date,
+$T_0=t_s$, $T_n=t_e$ and
+$\pi_i$ is a calendar factor.
+The value of $S(t_x,t_s,t_e)$, assuming simple calendar conventions, can be expressed as
+
+\beqn
+S(t_x,t_s,t_e)=\frac{1-P(t_x,t_e)}{A(t_x)}\,.
+\eeqn
+
+Let us write the risk neutral dynamics of $S(t_x,t_s,t_e)$ as
+\beqn
+dS(t,t_s,t_e)=\mu(t)\,dt\,+\,\sigma_{s,e,i}(t)\,dW_i(t)\,.
+\eeqn
+
+Employing Ito's lemma, we have, for $t\le t_s$
+\beqn
+\begin{aligned}
+\sigma_{s,e,i}(t)=&\,\frac{1-P(t,t_e)}{A^2}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,+\,\frac{P(t,t_e)}{A(t)}\,\bar{\sigma}_n(t,t_e)\\
+\sigma_{s,e,i}(t)=&\,\frac{1}{A(t)}\left(\frac{1-P(t,t_e)}{A(t)}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)\\
+\sigma_{s,e,i}(t)=&\,\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)\,.
+\end{aligned}
+\eeqn
+
+Substituting from Equation~\eqref{eq:forwards}, we get
+
+\beqn\label{eq:fsvol}
+\sigma_{s,e,i}(t)=\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i\, P(t,T_j)\int_t^{T_j}\sigma_i(t,u)\,du\,+\,P(t,t_e)\int_t^{t_e}\sigma_i(t,u)\,du\right)\,.
+\eeqn
+
+Equation~\eqref{eq:fsvol} represents the forward swap volatility in terms of the terms
+structure volatilities of the instantaneous forward rates.
+Using this equation one can construct a set of arbitrage-free swap volatilities,
+given a set of instant forward volatilities.
+Similarly, given a set of {\em consistent} swap volatilities, one should be able to deduce,
+at least numerically, the
+instantaneous forward volatilities.
+The consistency condition is needed due to the fact that the nonlinear function of Equation~\eqref{eq:fsvol}
+is necessarily invertible.
+
+\subsection{Historical or Implied Volatility}
+Since true volatilities are not market observable,
+a proxy is always needed for their estimation.
+Practitioners either, resort to the liquid options market and use the implied volatility as a proxy,
+or resort to history and use realized volatility as a proxy.
+We propose the use of the options market implied volatilities to estimate the current
+instantaneous forward volatilities.
+For risk management, a stochastic volatility model is usually needed.
+The model can be in the form of a stochastic differential equation, or in the 
+form of a time series GARCH style model (see Tawfik (2025)\cite{T} for an example).
+The volatilities estimated from the options market can represent the starting
+values of the stochastic model.
+The parameters of the model can then be estimated from the historical data.
+Even then, one has a choice of either, resorting to the history of swaption implied volatilities,
+or the history of realized swap volatilities.
+
+\subsection{Instantaneous Forward Volatility Model}
+
+
+\subsection{Options on Different Tenors of Same Curve}
+Under the SABR model, the stochastic dependence across options written on different tenors of the same curve
+is made of two components.
+First is the correlation structure among the forwards themselves.
+Second is the correlation structure among the SABR volatility.
+
+If $F_t^i$ and $\sigma_t^i$ are the price and the SABR volatility
+of the forward contract associated with the $i$'s tenor at time t,
+then the following represents the associated Wiener increments
+
+\begin{subequations}
+    \begin{align}
+        dW_t^i=&\,\frac{dF_t^i}{\sigma_t^i\,(F_t^i)^\beta}\\
+        dZ_t^i=&\,\frac{dZ_t^i}{\nu^i\,\sigma_t^i}\\
+        [dW_t^i,\,dZ_t^i]=&\,\rho^i\,dt\,,
+    \end{align}
+\end{subequations}
+where $\beta^i$ and $\nu^i$ are the tenor specific SABR parameters.
+A time series for $dW_t^i$ and $dZ_t^i$ for each of the $N_T$ tenors can be constructed
+based on the forward prices and the corresponding shortest expiry option prices.
+Given a forward price, SABR model parameters are obtained by fitting the model
+to the prices of options of same expiry and various strikes.
+Having the individual tenor-specific time series, of size $N_t$ each,
+we then construct the two associated correlation matrices of the space of all tenors:
+the forward price correlation matrix $C_f$ and the volatility correlation matrix $C_\sigma$.
+The correlation matrices $C^{N_t\times N_T}$ can then be diagonalized, using the singular value decomposition (SVD),
+into the form $U^{N_t\times N_t}\,\Sigma^{N_t\times N_T}\,V^{N_T\times N_T}$, where $\Sigma$ is a diagonal
+matrix whose elements are in a
+non-decreasing order.
+It is typical for the correlation structure of the whole space to be explained
+be no more than the four largest values of $\Sigma$.
+
+To include the stochastic dependence among options written on the same
+curve we modify Equations~\eqref{eq:sabr} to read
+
+\begin{subequations}\label{eq:sabr_corr}
+    \begin{align}
+        dF_t^i=\,&(F_{t}^j)^{\beta} \sigma_t dW_t^j\quad&\beta\in[0,1],\,F_0^i>0\label{eq:sabr_corr_a}\\
+        d\sigma_t^i =\,&\nu \sigma_t^i dZ_t&\nu\ge 0,\,\sigma_0^i>0\label{eq:sabr_corr_b}\\
+        [dZ_t^i,dW_t^i] =\,& \rho^i dt&\rho \in[-1,1]\\
+        dZ_t^i =\,&(1-\sum_{j=1}^{N_\sigma}\gamma_j^2)^\half d\tilde{Z}_t^i + \sum_{j=1}^{N_\sigma}\gamma_{ij} d\tilde{Z}_t^j\\
+        dW_t^i =\,&(1-\sum_{j=1}^{N_f}\lambda_{ij}^2)^\half d\tilde{W}_t^i + \sum_{j=1}^{N_f}\lambda_{ij} d\tilde{W}_t^j
+    \end{align}
+\end{subequations}
+where $N_f$ and $N_\sigma$ are the number of the largest eigenvalues $\lambda_{ij}$
+sufficient to explain the total variances of the set of forwards and their option volatilities,
+respectively.
+
+
+\subsection{Options on Same Underlying}
+When given a portfolio of options written on the same underlying,
+but with different strike prices and expiry dates,
+the time dependency of the SABR parameters is implicitly hidden
+in the prices of these options.
+In this section, we will develop an approach for extracting the
+implied risk-neutral time dependency information from an option
+portfolio.
+
+Let $\Pi$ be a portfolio of a collection of at-the-money options.
+Each option $C_i\in\Pi$ is associated with a tuple of
+SABR parameters $(\sigma,\nu,\rho,\beta,\tau)_i$.
+The SABR parameters of $C_i$ are identified by examining
+all available option prices of same expiry on the same underlying.
+For SABR parameter identification techniques, see 
+ 
+
+
 \section{Implied Volatility Surface}
 Let $\mathbb{D}$ be defined as
 \beqn
@@ -731,6 +899,42 @@ of the simulation paths.
 
 \section{PCA Complexity Reduction}
 
+\section{Bayesian Volatility}
+Assuming a standard filtered probability space $(\Omega, \mathcal{F}, \mathcal{F}_t, P)$,
+let the processes $F_t(F_0,\sigma_t,I_t),\,\sigma_t(\sigma_0)\,\text{and}\,I_t(\sigma_t)$
+be $\mathcal{F}_t$-measurable according to the SABR dynamics, stated in the preceding sections.
+In this section, we are concerned with finding the best estimate for
+$\sigma_t$, where $F_t$ has been generated from an exogenous process.
+Using Bayesian statistics, we can write
+
+\beqn
+P(\sigma_t=s|F_t=f)=\frac{P(F_t=x|I_t=a,\sigma_t=s)P(I_t=a|\sigma_t=s)P(\sigma_t=s)}{P(F_t=f)}\,.
+\eeqn
+Or more precisely,
+
+\begin{subequations}
+    \begin{align}
+        P&(\sigma_t=s|F_t=f)=\,\frac{P(F_t=f|I_t\in da,\sigma_t\in ds)P(I_t=a|\sigma_t\in ds)P(\sigma_t=s)}{P(F_t=f)}\\
+        P&(F_t=f)=\int_0^\infty \int_0^\infty P(F_t=f|I_t\in da,\sigma_t\in ds)\,P(I_t=a|\sigma_t\in ds)\,P(\sigma_t=s)\, da\,ds\,.
+    \end{align}
+\end{subequations}
+Since we have already shown, in the early part of this paper, how to compute the distributions
+$P(F_t=f|I_t\in da,\sigma_t\in ds),\,P(I_t=a|\sigma_t\in ds)\,\text{and}\,P(\sigma_t=s)$,
+we can now, at least numerically, compute the distribution $P(\sigma_t=s|F_t=f)$ and
+its CDF $Q_\sigma(s|F_t=f)$ defined as,
+
+\beqn
+\begin{aligned}
+    Q_\sigma(s|F_t=f)=&\,P(\sigma_t\le s|F_t=f)\\
+        =&\,\int_0^s P(\sigma_t=s|F_t=f)\,ds\,.
+\end{aligned}
+\eeqn
+To sample the distribution $Q_\sigma(.)$, we need to compute $Q_\sigma^{-1}(U)$,
+where $U\sim Uniform(0,1)$ and $Q_\sigma^{-1}$ is the inverse of $Q_\sigma(.)$
+
+
+
+
 \bigskip
 \begin{thebibliography}{99}
     \bibitem{AW}
@@ -755,14 +959,21 @@ of the simulation paths.
     \bibitem{HKLW1}
         Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2014,
         "Arbitrage-Free SABR," {\em Wilmott} (2014):60-75. doi:10.1002/wilm.10290
+    \bibitem{HJM}
+        Heath, D., Jarrow, R. and Morton, A. (1992), "Bond Pricing and the Term Structure of Interest Rates:
+        A New Methodology for Contingent Claims Valuation," {\em Econometrica} 60(1):77-105.
+        doi:10.2307/2951677
     \bibitem{I}
         Islah, Othmane, 2009, “Solving SABR in Exact Form and Unifying It with LIBOR Market Model,”
-        SSRN eLibrary.
-        http://papers.ssrn.com/sol3/papers.cfm?astract-id=1489428
+        SSRN: http://papers.ssrn.com/sol3/papers.cfm?astract-id=1489428
     \bibitem{K}
         Kang, C., 2014, "Simulation of the Shifted Poisson Distribution with an Application
         to the CEV Model," {Management Science and Financial Engineering}, 20:27-32.
         doi:10.7737/MSFE.2014.20.1.027
+    \bibitem{L}
+        Cheng, Luo, 2016, "On the Calibration of the SABR Model and its
+        Extensions," Thesis submitted as part of the requirements for the award
+        of the MSc in Mathematics and Finance, Imperial College London. 
     \bibitem{MG}
         Makarov, R.N. and Glew, D., 2010, "Exact Simulation of Bessel Diffusions,"
         {\em Monte Carlo Methods and Applications} 16:312-347.
@@ -772,12 +983,21 @@ of the simulation paths.
         laws at fixed time," {\em Probability Surveys} 2:312-347.
         doi:10.1214/154957805100000159 
     \bibitem{P}
-    Paulot, Louis, 2015, "Asymptotic Implied Volatility at the Second Order with
-    Application to the SABR Model," In: Friz, P., Gatheral, J., Gulisashvili,
-    A., Jacquier, A., Teichmann, J. (eds) {\em
-    Large Deviations and Asymptotic Methods in Finance}.
-    Springer Proceedings in Mathematics \& Statistics, (110)
-    Springer, Cham. https://doi.org/10.1007/978-3-319-11605-1\_2
-    arXiv:0906.0658v3
+        Paulot, Louis, 2015, "Asymptotic Implied Volatility at the Second Order with
+        Application to the SABR Model," In: Friz, P., Gatheral, J., Gulisashvili,
+        A., Jacquier, A., Teichmann, J. (eds) {\em
+        Large Deviations and Asymptotic Methods in Finance}.
+        Springer Proceedings in Mathematics \& Statistics, (110)
+        Springer, Cham. https://doi.org/10.1007/978-3-319-11605-1\_2
+        arXiv:0906.0658v3
+    \bibitem{SGO}
+        van der Stoep, Anthonie and Grzelak, Lech Aleksander and
+        Oosterlee, Cornelis W., 2015, "The Time-Dependent FX-SABR Model:
+        Efficient Calibration Based on Effective Parameters,"
+        {\em International Journal of Theoretical and Applied Finance}, 18(6),
+        SSRN: https://ssrn.com/abstract=2503891 
+        doi:10.2139/ssrn.2503891
+    \bibitem{T}
+         Tawfik, Maged, 2025, "Monte Carlo Simulation of SOFR Yield Curve," {\em Working Paper}.
 \end{thebibliography}
 \end{document}
