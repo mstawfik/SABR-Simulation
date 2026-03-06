@@ -202,6 +202,8 @@ SABR is given by the following equations
 
 where $F_t, \sigma_t\in\mathcal{F}_t$, $[.,.]$ is the quadratic variation operator and
 $dW_t, dZ_t$ are standard Wiener increments.
+Throughout the document, the term SABR volatility will refer to $\sigma_t$ of
+Equation~\eqref{eq:sabr}
 
 Pricing derivatives based on the SABR model is done using either a PDE (Partial Differential Equation)
 solver based on the two-dimensional discretization of the Kolmogorov backward equation,
@@ -500,7 +502,7 @@ As is the case with almost all approximation approaches of this nature,
 the accuracy of the final result increases in inverse proportion to
 the time step $t$.
 
-\section{Implied Volatility}
+\section{Implied Volatility}\label{sec:ivol}
 Given an option pricing model, the {\em implied
 volatility} is a value, reflective of the variance of the stochastic process,
 that, when plugged into the model, gives the observed option price.
@@ -582,7 +584,7 @@ Once the option price is obtained, it can be used to obtain the
 desired implied volatility by, usually numerically, solving the
 relevant inverse pricing model $B^{-1}(.)$.
 
-\section{Asymptotic Representations}
+\section{Asymptotic Representations}\label{sec:asym}
 Since deriving closed form analytic formulas for derivatives pricing is,
 most of the time, impossible or impractical,
 a significant amount of research effort has been directed towards
@@ -657,18 +659,27 @@ large initial volatility and large vol-of-vol.
 \section{Option Portfolio}
 In the preceding sections we developed a framework for simulating
 the correlated movement of forward prices and volatilities at
-future time horizons.
+future time horizons, on a single option.
 Such framework is useful for pricing options written at time $t_0$ 
 with expiry that
 matches any of the simulation horizon.
-This assumes that the starting values of $\sigma, \nu, \rho, \beta\,$
+This assumes that the starting values of $\nu, \rho, \beta\,$
 are known at time $t_0$ and either, remain constant, or are
 given as known function in time.
-Moreover, options written on different tenors of the same
+
+A portfolio of options written on different contracts of the same
 interest rate curve have to reflect the stochastic dependence
-of the forward prices of the various tenors.
-Otherwise, simulation results may be totally unrealistic or even non-arbitrage-free.
-In this section we will address these two issues.
+of the forward prices of such contracts.
+Otherwise, simulation results may be totally unrealistic or even non arbitrage-free.
+In this section we will address this issue as it pertains to a portfolio of
+interest rate swaptions.
+
+\subsection{SABR in a Portfolio Setting}
+In a portfolio setting, we may choose to re-write Equation~\eqref{eq:sabr} as
+
+\beqn
+dF=\,&F_{t}^{\beta} \sigma_t dW_t\quad&\beta\in[0,1],\,F_0>0\\
+\eeqn
 
 \subsection{Forward Swap Volatility}
 Let us start by assuming the following risk neutral dynamics for the instantaneous forward rate $f(t,T)$,
@@ -703,7 +714,7 @@ $\pi_i$ is a calendar factor.
 The value of $S(t_x,t_s,t_e)$, assuming simple calendar conventions, can be expressed as
 
 \beqn
-S(t_x,t_s,t_e)=\frac{1-P(t_x,t_e)}{A(t_x)}\,.
+S(t_x,t_s,t_e)=\frac{P(t_x,t_s)-P(t_x,t_e)}{A(t_x)}\,.
 \eeqn
 
 Let us write the risk neutral dynamics of $S(t_x,t_s,t_e)$ as
@@ -714,16 +725,24 @@ dS(t,t_s,t_e)=\mu(t)\,dt\,+\,\sigma_{s,e,i}(t)\,dW_i(t)\,.
 Employing Ito's lemma, we have, for $t\le t_s$
 \beqn
 \begin{aligned}
-\sigma_{s,e,i}(t)=&\,\frac{1-P(t,t_e)}{A^2}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,+\,\frac{P(t,t_e)}{A(t)}\,\bar{\sigma}_n(t,t_e)\\
-\sigma_{s,e,i}(t)=&\,\frac{1}{A(t)}\left(\frac{1-P(t,t_e)}{A(t)}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)\\
-\sigma_{s,e,i}(t)=&\,\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)\,.
+\sigma_{s,e,i}(t)=&\,\frac{P(t,t_s)-P(t,t_e)}{A^2}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,
+-\,\frac{P(t,t_s)}{A(t)}\,\bar{\sigma}_n(t,t_s)+\,\frac{P(t,t_e)}{A(t)}\,\bar{\sigma}_n(t,t_e)\\[12.5pt]
+=&\,\frac{1}{A(t)}\left(\frac{P(t,t_s)-P(t,t_e)}{A(t)}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,
+-\,P(t,t_s)\,\bar{\sigma}_n(t,t_s)+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)\\[12.5pt]
+=&\,\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,
+-\,P(t,t_s)\,\bar{\sigma}_n(t,t_s)+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)
 \end{aligned}
 \eeqn
 
 Substituting from Equation~\eqref{eq:forwards}, we get
 
 \beqn\label{eq:fsvol}
-\sigma_{s,e,i}(t)=\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i\, P(t,T_j)\int_t^{T_j}\sigma_i(t,u)\,du\,+\,P(t,t_e)\int_t^{t_e}\sigma_i(t,u)\,du\right)\,.
+\begin{aligned}
+\sigma_{s,e,i}(t)=&\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i\, P(t,T_j)\int_t^{T_j}\sigma_i(t,u)\, du\right.\\
+&-\left.\,P(t,t_s)\int_t^{t_s}\sigma_i(t,u)\,du+\,P(t,t_e)\int_t^{t_e}\sigma_i(t,u)\,du\right)\\
+\sigma_{s,e,i}(t)=&\,\frac{S(t,t_s,t_e)}{A(t)}\,\sum_{j=0}^n\pi_i\, P(t,T_j)\int_t^{T_j}\sigma_i(t,u)\, du\\
+&-\,S(t,t_s,t_e)\int_t^{t_s}\sigma_i(t,u)\,du+\,\frac{P(t,t_e)}{A(t)}\int_{t_s}^{t_e}\sigma_i(t,u)\,du\,.
+\end{aligned}
 \eeqn
 
 Equation~\eqref{eq:fsvol} represents the forward swap volatility in terms of the terms
@@ -733,16 +752,24 @@ given a set of instant forward volatilities.
 Similarly, given a set of {\em consistent} swap volatilities, one should be able to deduce,
 at least numerically, the
 instantaneous forward volatilities.
-The consistency condition is needed due to the fact that the nonlinear function of Equation~\eqref{eq:fsvol}
-is necessarily invertible.
+
+
 
 \subsection{Historical or Implied Volatility}
 Since true volatilities are not market observable,
 a proxy is always needed for their estimation.
-Practitioners either, resort to the liquid options market and use the implied volatility as a proxy,
-or resort to history and use realized volatility as a proxy.
+Practitioners, either resort to the liquid options market and use the implied volatility as a proxy,
+or to history and use realized volatility as a proxy.
 We propose the use of the options market implied volatilities to estimate the current
 instantaneous forward volatilities.
+
+The set of implied volatilities associated with the prices of a set of contemporaneous swaptions on the
+same interest rate curve define what is called a {\em volatility cube}.
+The underlying dimensions of the cube are: tenor, strike and expiry.
+In Section~\ref{sec:ivol}, we discussed the various types of implied volatilities
+and how they can be calculated from swaption prices.
+In Section~\ref{sec:asym}, we showed how 
+
 For risk management, a stochastic volatility model is usually needed.
 The model can be in the form of a stochastic differential equation, or in the 
 form of a time series GARCH style model (see Tawfik (2025)\cite{T} for an example).
