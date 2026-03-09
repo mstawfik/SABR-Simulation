@@ -960,8 +960,34 @@ To sample the distribution $Q_\sigma(.)$, we need to compute $Q_\sigma^{-1}(U)$,
 where $U\sim Uniform(0,1)$ and $Q_\sigma^{-1}$ is the inverse of $Q_\sigma(.)$
 
 
+\section{CIR}
+Milstein representation
 
+The **Cox-Ingersoll-Ross (CIR)** process is the stochastic differential equation (SDE):
 
+$$
+dX_t = \kappa (\theta - X_t) \, dt + \sigma \sqrt{X_t} \, dW_t, \quad X_0 = x_0 \geq 0
+$$
+
+where $\kappa > 0$, $\theta > 0$, $\sigma > 0$ are constants, and $W_t$ is a standard Wiener process.
+
+The **Milstein scheme** is a higher-order Itô–Taylor discretization (strong order 1.0 for Lipschitz SDEs,
+but the CIR diffusion is only Hölder-1/2 continuous near zero, so special care is often needed).
+
+- The term $\frac{\sigma^2}{4} (\Delta W^2 - \Delta t)$ comes from the Itô correction (second-order term).
+- This scheme can become **negative** when $X_i$ gets close to zero (especially when the Feller condition $2\kappa\theta > \sigma^2$ is **not** satisfied).
+- Many practical implementations therefore use **reflecting**, **truncating**, **absorption**, or **implicit** variants (e.g. θ-Milstein with θ ≥ 0.5, fully implicit Milstein, drift-implicit square-root Milstein, etc.) to preserve non-negativity and/or moment stability.
+- For very accurate pathwise simulation when negativity must be avoided, people often prefer **exact simulation** (via non-central chi-squared transitions) or Lamperti-transformed schemes instead of plain Milstein.
+
+So the **classical explicit Milstein representation** of the CIR process is:
+
+$$
+\boxed{
+X_{i+1} = X_i + \kappa(\theta - X_i)\Delta t + \sigma\sqrt{X_i}\,\Delta W_i + \dfrac{\sigma^2}{4}\bigl((\Delta W_i)^2 - \Delta t\bigr)
+}
+$$
+
+Let me know if you'd like the implicit versions, a truncated/reflecting variant, MATLAB/Python code snippet, or comparison with Euler / exact scheme!
 \bigskip
 \begin{thebibliography}{99}
     \bibitem{AW}
