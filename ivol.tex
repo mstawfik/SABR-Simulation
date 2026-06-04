@@ -1,0 +1,388 @@
+\documentclass[12pt,oneside]{article}
+\usepackage{etoolbox}
+\usepackage[T1]{fontenc}
+\usepackage[full]{textcomp}
+\usepackage{fancyhdr}
+\usepackage{longtable}
+%\usepackage[dvips]{graphics,color}      % usual driver for dvi or ps viewer
+\usepackage[]{graphicx,color}      % usual driver for converting to pdf later
+\usepackage[bottom=1in]{geometry}
+\usepackage{verbatim}
+%\usepackage[cmintegrals,cmbraces]{newtxmath}
+\usepackage[intlimits]{amsmath}    % need for subequations
+%\usepackage[]{amsmath}    % need for subequations
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%\usepackage{ebgaramond-maths}
+\usepackage[sb]{ebgaramond} %semi-bold option
+%\input{../ebgaramond-missing.tex}
+\usepackage[boxed]{algorithm2e}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{courier}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{longtable}
+\usepackage{cellspace}
+%\usepackage{multirow}
+%\usepackage{subsection}
+
+%\renewcommand{\rmdefault}{ugm} %old Garamond
+\newcommand{\ttt}[1]{\texttt{\footnotesize{#1}}}
+\graphicspath{./}
+\DeclareGraphicsExtensions{.pdf,.eps}
+\newcommand{\beqn}{\begin{equation}}
+\newcommand{\eeqn}{\end{equation}}
+\newcommand{\beqnn}{\begin{equation*}}
+\newcommand{\eeqnn}{\end{equation*}}
+\newcommand{\half}{\text{\scriptsize\ensuremath{\frac{1}{2}}}}
+\newcommand{\redsize}[1]{\text{\scriptsize\ensuremath{#1}}}
+\newcommand{\bsym}[1]{\boldsymbol{#1}}
+\newcommand{\tinysize}[1]{\text{\tiny\ensuremath{#1}}}
+\newcommand{\eee}{\text{\large{\rm e}}}
+\newcommand{\E}{{\rm I\kern-.3em E}}
+\newcommand{\pr}{\mathbb{P}}
+\newcommand{\var}{{\rm Var}}
+\newcommand{\defas}{\overset{*}{=}}
+\newcommand{\sL}{{L}}
+\newcommand{\edge}[2]{#1\!\!\rightarrow\!\!#2}
+\newcommand{\sedge}[2]{#1\rightarrow#2}
+\newcommand{\sumno}{\sum\nolimits}
+\newcommand{\ns}[1]{\mbox{\normalsize $#1$}}
+
+\let\osetminus\setminus
+\renewcommand{\setminus}{\!\osetminus\!}
+\let\oin\in
+
+\renewcommand{\in}{\!\oin\!}
+
+\numberwithin{equation}{section}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\mino}{min}
+\DeclareMathOperator*{\maxo}{max}
+\DeclareMathOperator*{\erf}{erf}
+\DeclareMathOperator*{\arcosh}{arcosh}
+\DeclareMathOperator*{\sgn}{sign}
+\DeclareMathOperator*{\forallo}{\Large\forall}
+\newcommand{\ie}{{\em i.e.}\ }
+\newcommand{\eg}{{\em e.g.}\ }
+\newtheorem{defn}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{cor}{Corollary}
+\newtheorem{prop}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newenvironment{proof}[1][]{\paragraph{Proof #1:}}{\hfill$\square$}
+\patchcmd{\thebibliography}{\section*{\refname}}{\section*{\refname}}{}{}
+\let\oabsname\abstractname
+\renewcommand{\abstractname}{\large{\oabsname}}
+
+\newenvironment{Itemize}{\vspace{-0.5\parskip}\begin{itemize}}{\end{itemize}}
+\newenvironment{Enumerate}{\vspace{-0.5\parskip}\begin{enumerate}}{\end{enumerate}}
+%\setlist*[itemize]{noitemsep, topsep=0pt}
+\setlist*[itemize]{itemsep=5pt, topsep=0pt}
+\setlist*[enumerate]{itemsep=5pt, topsep=0pt}
+
+%\definecolor{bggrey}{rgb}{0.95,0.95,0.95}
+\definecolor{bggrey}{rgb}{0.93,0.95,0.94}
+%\definecolor{bggrey}{rgb}{239,241,242}
+
+\lstdefinestyle{mystyle} {
+  framexleftmargin=2pt, %keeps numbers outside of frame
+  %framextopmargin=15pt,
+  %framexbottommargin=-15pt,
+  frame=tb,
+  framesep=7pt,
+  rulecolor=\color{bggrey},
+  backgroundcolor=\color{bggrey},
+  basicstyle=\ttfamily\scriptsize,
+  linewidth=1.0\textwidth,
+  numbers=left,
+  showlines=true,
+  numberblanklines=false,
+  stepnumber=1,
+  numbersep=5pt,
+  %numberstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=2,
+  keepspaces=true,
+  mathescape=true,
+  escapeinside={(*@}{@*)}
+}
+
+\lstdefinestyle{mystyle1} {
+  %backgroundcolor=\color{bggrey},
+  %basicstyle=\ttfamily\scriptsize,
+  linewidth=0.5\textwidth,
+  numbers=none,
+  belowskip=-0.8 \baselineskip,
+  %breaklines=true,
+  %breakatwhitespace=true
+}
+\lstset{style=mystyle}
+
+% don't need the following. simply use defaults
+\setlength{\baselineskip}{16.0pt}    % 16 pt usual spacing between lines
+% Default margins are too wide all the way around.  I reset them here
+\setlength{\parskip}{2ex plus 2pt}
+\setlength{\parindent}{0pt}
+\setlength{\oddsidemargin}{.125in}
+%\setlength{\oddsidemargin}{0.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\marginparsep}{0.75cm}
+\setlength{\marginparwidth}{2.5cm}
+\setlength{\marginparpush}{1.0cm}
+\setlength{\textwidth}{6.25in}
+%\setlength{\textwidth}{150mm}
+\setlength{\textheight}{9in}
+\setlength{\topmargin}{-.5in}
+
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{fpstyle}{ %define a style for fitst page
+  \fancyhf{}
+  \fancyfoot[L]{{\small\em Working Paper}}
+  %\fancyfoot[R]{{\small\em Confidential}}
+}
+\fancyhf{} %clear all header and footer fields
+\fancyfoot[L]{{\small\em Working Paper}}
+%\fancyfoot[R]{{\small\em Confidential}}
+\fancyfoot[C]{\thepage}
+                 
+\title{
+  \textsc{Interest Rate Volatility Surface Simulation\\
+  for Risk Management}\\%\footnotemark
+  \large{\em{(Working Paper)}}
+}
+\author{Maged Tawfik%\footnotemark %\\
+%Citibank
+}
+\renewcommand{\today}{\vspace{-20pt}\it \small{May 28, 2026}}
+
+\begin{comment}
+\end{comment}
+
+\begin{document}
+\pagestyle{fancy}
+
+%\leftdisplays
+\maketitle
+\thispagestyle{fpstyle} % use if do not want page numbers
+%\pagestyle{empty} % all pages are not numbered
+\begin{center}
+\end{center}
+\footnotetext[1]{The opinions expressed in the paper are those of the author and do not necessarily reflect the view of Citibank.}
+\footnotetext[2]{email: maged.tawfik@citi.com}
+%\begin{abstract}
+%\input{liqNetflowAbstract_txt.tex}
+%\end{abstract}
+\section{Problem Setup}
+The implied volatility of an option on an interest rate contract
+is the model volatility that makes the model price match the
+market price of the option.
+Swaps, forwards and future contracts
+are examples of the underlying instruments.
+Swaptions, caps and floors are examples of the options.
+The quoted implied volatility is usually either the normal (Bachelier)
+volatility, the Black (lognormal) volatility or the CEV (Constant
+Elasticity of Variance) volatility.
+The choice depends on the model used to price the option.
+Converting from one form of implied volatility to another can be
+typically done using either closed from or semi-analytic approximations.
+
+The price function of a simple option $C$ can be assumed a function of
+the form $C(v\,; F, k, x): v\mapsto c$, where $c$ is the option price,
+and $F, v, k, x$ are the risk neutral forward price of the
+underlying contract, its implied volatility,
+the strike price of the option and
+its time to expiry, respectively.
+For at-the-money options, $k=F$.
+Let $\mathbb{C}_v$ be the space of functions $C_v:(F,k,x)\mapsto c$,
+\ie $C_v(.)=C(v;.)$, which are monotonic in $v$.
+The implied volatility surface, of such options, can be formally defined as the map
+\beqn
+\begin{aligned}
+    V\!:&\;X\times T\times K\rightarrow \mathbb{C}_v\\
+    &(x,t,k)\mapsto C_v(.)\\
+    &(x,t,k)\mapsto v
+\end{aligned}
+\eeqn
+where $X$ is a set of times to expiry, $T$ is a set of contract tenors and
+$K$ is a set of strike prices, and where $v$ is the implied volatility. 
+Put differently, $V(x,t,k)=C^{-1}(c;F,k,x)$.
+
+It is not uncommon, in options modeling,
+to use appropriate models to relate the price of
+off-the-money options to at-the-money ones of the same
+expiry date.
+Most such models are rich enough to handle smile and skew effects.
+As a result, the dimensionality of the volatility surface can be reduced
+by limiting it to at-the-money options.
+In such case,
+the implied volatility surface reduces to,
+$V: X\times T\rightarrow \mathbb{C}_v$.
+
+\section{Forward Stochastic model}
+The current common options market practice is to model the stochastic behavior of interest rate contracts
+using the SABR model, namely
+
+\beqn\label{eq:sabr}
+\begin{aligned}
+&dF =\; F^\beta \alpha\, dW_F\\
+&d\alpha =\;\alpha\, \nu\, dW_\alpha\\
+&<dW_F,\, dW_\alpha> \;=\rho
+\end{aligned}
+\eeqn
+where $F$ is the risk neutral forward price of the underlying contract,
+and $dW_F, dW_\alpha$ are the Wiener increments associated with
+the forward price and its volatility, respectively.
+Notice that $\alpha$ represents the volatility of the forward contract,
+while $\nu$ represents the volatility of $\alpha$, and thus
+termed the vol of vol.
+
+Semi-analytic methods, such as those given by Hagan and by Palout
+(see Choi and Wu \cite{CW} for a full discussion on this topic)
+are typically used to convert a SABR volatility tuple $(\alpha, \beta, \rho, \nu)$
+to an equivalent normal, Black or CEV volatility.
+If we assume the existence of a function
+$H:(\alpha,\beta,\rho,\nu;\,x\in X, t\in T, k\in K)\mapsto v$,
+then simulating the values of $\alpha$ over $X\times T$
+should suffice to fully describe the dynamics of the implied
+volatility surface.
+
+The inverse of the monotonic $H(\alpha|.)$, which we shall denote $H^{-1}(v|.)$,
+can be used to calculate SABR $\alpha$ from implied volatility,
+given the reset of the parameters.
+For a given $x$ and $t$ observable option prices, at a given point in time,
+for a large enough set of $k$ values can be used
+to solve for the parameters $\alpha, \beta, \rho$ and $\nu$.
+The parameters $\beta, \rho$ and $\nu$ tend to remain stable for extended periods of time,
+and once determined, can be assumed to remain constant during simulation.
+
+For the current work, we will use a CIR variation of
+the SABR model \eqref{eq:sabr}.
+Our model, has the following dynamics
+\beqn\label{eq:cir}
+\begin{aligned}
+&dF_{x,t} =\; F_{x,t}^{\beta_{x,t}} \alpha_{x,t}\, dW_{F_{x,t}}\\
+&d\alpha_{x,t} =\;\theta_{x,t}(\mu_{x,t} - \alpha_{x,t})\,dt\,+\, \nu_{x,t}\,\sqrt\alpha_{x,t}\, dW_{\alpha_{x,t}}\\
+&<\!dW_{F_{x,t}},\, dW_{\alpha_{x,t}}\!> \;=\rho_{x,t}
+\end{aligned}
+\eeqn
+where the index $x,t$ refers to the point in the grid,
+and $\mu_{x,t}$ and $\theta_{x,t}$ are the process mean and
+the mean reversion speed, respectively.
+Unless needed for clarity, we will drop the $x,t$ index in the remainder of the work for simplicity of presentation.
+
+\section{Parameter Estimation}
+We rely on historical time series analysis for 
+the estimation of the parameters associated with the model given by \eqref{eq:cir}.
+First, we construct a time series of sufficient length for the implied at-the-money volatility
+of a given tenor and time to expiry.
+We then use a semi-analytic model such as the modified Hagan model \cite{HKLW} or the Paulot \cite{P} model
+to convert
+the implied volatility time series to a time series for the SABR $\alpha$ of \eqref{eq:cir}.
+
+Prykhodko and Ralchenko \cite{PR} suggested the following as an unbiased estimator for the diffusion parameter,
+assuming ergodic behavior and given a time series of forward prices $F_i, i\le n$,
+that covers a period of $t_n$ years,
+
+\beqn
+\hat{\nu}^2 = \frac{n}{t_n}\,\frac{\sum_{i<n} (F_i-F_{i-1})^2}{\sum_{i<n}F_i}\,.
+\eeqn
+
+Ben Alaya and Kebaier \cite{BK} showed that
+
+\beqn
+\frac{1}{t_n}\,\int_0^{t_n} F_s ds\,\xrightarrow{\;\;\mathbb{P}\;\;}\,\mu\quad \text{as} \quad t\!\longrightarrow\!\infty\,.
+\eeqn
+
+They also suggested the following for the consistent estimation of $\theta$
+
+\beqn
+\hat{\theta}\,=\,\frac{t_n\,(\log{F_n}-\log{F_0}+\frac{t_n}{2n}S^2\sum_{i<n}\frac{1}{F_i})-\frac{t_n}{n}(F_n-F_0)\sum_{i<n}\frac{1}{F_i}}
+{t_n^2\,(\,\frac{1}{n^2}\sum_{i<n}\frac{1}{F_i}\,\sum_{i<n}F_i\;-\;1\,)}\,.
+\eeqn
+
+\section{PCA Analysis}
+Detailed time series analysis of SOFR interest rate swaptions between 2020 and 2026, showed significant correlation.
+The options included in the dataset included 17 times to expiry and 23 tenors, \ie
+the $X\times T$ set had a cardinality of 391.
+It was found out that 76\% of the total variance in the
+normalized (centered and scaled) daily change in the SABR alpha value, was explained by the first principal component.
+The first three components were sufficient to explain 94\% of the total variance.
+Whereas, 98\% was explained by the first five components.
+These results suggest that the full implied volatility surface can
+be reliably simulated using a handful of stochastic factors.
+
+Given a historical time series matrix $M$ of $N_h$ rows and
+$X\times T$ columns, where $N_h$ is the number of observations of $\alpha$ values for each grid point,
+the SVD (Singular Value Decomposition) of X is given by
+\beqn
+M = U\;S\;V^\top
+\eeqn
+where $M$ is an $N_h\times(X\times T)$ matrix, $U$ an $N_h\times N_h$ matrix,
+$S$ an $N_h\times(N\times T)$ diagonal matrix of non-negative non-increasing real numbers,
+and $V$ an $(X\times T)\times(X\times T)$ matrix.
+
+Retaining only the top $p$ principal components, the SABR $\alpha_{x,t}$ of any option $(x,t)$ can be expressed
+as
+
+\beqn
+\begin{aligned}
+d\alpha_{x,t}=&\theta_{x,t}(\mu_{x,t} - \alpha_{x,t})\,dt\,+\, \nu_{x,t}\,\sqrt\alpha_{x,t}\,
+\sum_{i\le p}\rho_{i,x,t}\, dW_i\\
+\rho_{i,x,t}=&\frac{1}{R}\,S_{i,i}\,V_{(x,t),i}\\[10pt]
+R=&\sqrt{\sum_{i\le p}(S_{i,i}V_{(x,t),i})^2}
+\end{aligned}
+\eeqn
+where $dW_i$ are $p$ Wiener increments for each time step.
+
+\section{Monte Carlo Simulation}
+The nonlinearity involved in the CIR process requires delicate attention to the discretization
+scheme employed in the Monte Carlo simulation.
+The algorithms developed by Alfonsi \cite{A} offer a few higher order reliable schemes,
+which allow a larger simulation time step without loss of accuracy while preserving the
+non-negativity condition on $\alpha$.
+
+In the current work, we chose the $E(0)$ discretization algorithm specified by Alfonsi \cite{A}.
+Using our notation, Alfonsi's $E(0)$ is given by
+
+\beqn
+\hat{\alpha}_{t_{i+1}}=\hat{\alpha}_{t_i}(1-\theta \delta)\,+\,\nu\sqrt{\hat{\alpha_{t_i}}}(W_{t_{i+1}}-W_{t_i})\,+
+\frac{1}{4}\nu^2(W_{t_{i+1}}-W_{t_i})^2 + \delta(\mu\theta-\frac{1}{4}\nu^2)
+\eeqn
+where $\delta$ is the simulation time step.
+
+\begin{thebibliography}{99}
+    \bibitem{A}
+        Aurélien, Alfonsi, 2010, "High Order Discretization Schemes
+        For The Cir Process: Application
+        To Affine Term Structure And Heston Models,"
+        Mathematics Of Computation, 79(269), 209-237
+    \bibitem{BK}
+        Ben Alaya M, Kebaier A, 2013, “Asymptotic Behavior of the Maximum Likelihood Estimator for Ergodic and Nonergodic Square-root Diffusions.” Stochastic Analysis and Applications, 31(4), 552-573. doi:10.1080/07362994.2013.798175.
+    \bibitem{CW}
+        Choi, Jaehyuk and Wu, Lixin, 2020, "The Equivalent Constant-elasticity-of-variance (CEV) Volatility
+        of the Stochastic-Alpha-Beta-Rho (SABR) Model,"
+        arXiv:1911.13123v3
+    \bibitem{HKLW}
+        Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2014,
+        "Arbitrage-Free SABR," {\em Wilmott} (2014):60-75. doi:10.1002/wilm.10290
+    \bibitem{P}
+        Paulot, Louis, 2015, "Asymptotic Implied Volatility at the Second Order with
+        Application to the SABR Model," In: Friz, P., Gatheral, J., Gulisashvili,
+        A., Jacquier, A., Teichmann, J. (eds) {\em
+        Large Deviations and Asymptotic Methods in Finance}.
+        Springer Proceedings in Mathematics \& Statistics, (110)
+        Springer, Cham. https://doi.org/10.1007/978-3-319-11605-1\_2
+        arXiv:0906.0658v3
+    \bibitem{PR}
+        Prykhodko, Olha, and Ralchenko, Kostiantyn, 2025, "Discretization and Asymptotic Normality of Drift Parameters Estimator
+        in the Cox-Ingersoll-Ross Model," Austrian Journal of Statistics, 54, 82-99. doi:10.17713/ajs.v54i1.1968
+\end{thebibliography}
+\end{document}
