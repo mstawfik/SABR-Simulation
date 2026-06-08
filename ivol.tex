@@ -195,13 +195,13 @@ Converting from one form of implied volatility to another can be
 typically done using either closed from or semi-analytic approximations.
 
 The price function of a simple option $C$ can be assumed a function of
-the form $C(v\,; F, k, x): v\mapsto c$, where $c$ is the option price,
-and $F, v, k, x$ are the risk neutral forward price of the
-underlying contract, its implied volatility,
+the form $C(v\,; F_{x,t}, k, x): v\mapsto c$, where $c$ is the option price,
+and $F_{x,t}, v, k, x$ are the risk neutral forward price at time $x$ of an
+underlying contract of tenor $t$, its implied volatility,
 the strike price of the option and
-its time to expiry, respectively.
-For at-the-money options, $k=F$.
-Let $\mathbb{C}_v$ be the space of functions $C_v:(F,k,x)\mapsto c$,
+the option's time to expiry, respectively.
+For at-the-money options, $k=F_{x,t}$.
+Let $\mathbb{C}_v$ be the space of functions $C_v:(F_{x,t},k,x)\mapsto c$,
 \ie $C_v(.)=C(v;.)$, which are monotonic in $v$.
 The implied volatility surface, of such options, can be formally defined as the map
 \beqn
@@ -213,7 +213,7 @@ The implied volatility surface, of such options, can be formally defined as the 
 \eeqn
 where $X$ is a set of times to expiry, $T$ is a set of contract tenors and
 $K$ is a set of strike prices, and where $v$ is the implied volatility. 
-Put differently, $V(x,t,k)=C^{-1}(c;F,k,x)$.
+Put differently, $V(x,t,k)=C^{-1}(c;F_{x,t},k,x)$.
 
 It is not uncommon, in options modeling,
 to use appropriate models to relate the price of
@@ -226,7 +226,7 @@ In such case,
 the implied volatility surface reduces to,
 $V: X\times T\rightarrow \mathbb{C}_v$.
 
-\section{Forward Stochastic model}
+\section{Forward Stochastic model}\label{sec:sm}
 The current common options market practice is to model the stochastic behavior of interest rate contracts
 using the SABR model, namely
 
@@ -342,6 +342,10 @@ R=&\sqrt{\sum_{i\le p}(S_{i,i}V_{(x,t),i})^2}
 \eeqn
 where $dW_i$ are $p$ Wiener increments for each time step.
 
+With the aid of the semi-analytic formula, $H(\alpha|.)$ of Section \ref{sec:sm},
+each simulated $\alpha_{x,t}$ can be converted to a simulated $V(x,t,k)$,
+and subsequently, a simulated at-the-money implied volatility surface.
+
 \section{Monte Carlo Simulation}
 The nonlinearity involved in the CIR process requires delicate attention to the discretization
 scheme employed in the Monte Carlo simulation.
@@ -358,6 +362,41 @@ Using our notation, Alfonsi's $E(0)$ is given by
 \eeqn
 where $\delta$ is the simulation time step.
 
+\section{Arbitrage Testing and Fixing}
+Johnson and Nonas \cite{JN} argued that the only arbitrage constraint that needs to be respected
+by swaptions on the same rate is the triangular inequality, namely,
+\beqn\label{eq:arb}
+C(v_1;F_{x,t1},k,x)+C(v_2;F_{t1+x,t2},k,t1+x)\ge C(v_3;F_{x,t1+t2},k,x)\,.
+\eeqn
+It is possible that the simulation generated implied volatility surface
+violates the condition \eqref{eq:arb}.
+To test for any violation of condition \eqref{eq:arb} and to alleviate any such violation,
+we offer the following algorithm.
+\bigskip
+\begin{lstlisting}
+    assume a grid of $\alpha(x,t)$ values
+    assume a grid of $V(x,t)$ values
+    assume a function $H(k)$ that maps $\alpha(x,t)$ to $V(x,t,k)$
+    let $h_x[x]$ be a hash table that returns the values $t$ for all valid $\alpha(x,t)$
+    let $h_t[t]$ be a hash table that returns the values $x$ for all valid $\alpha(x,t)$
+    for $x$ in $X$ (in increasing order):
+100     for $t$ in $h_x[x]$ (in increasing order):
+            $C1 = C(V(x,t,F_{x,t}))$
+            for $t1$ in $h_x[t+x]$ (in increasing order):
+                $C2 = C(V(x+t,t1,F_{x,t}))$
+                if $\alpha(x,t+t1)$ exists:
+                    $C3 = C(V(x,t+t1,F_{x,t}))$
+                    if $C3 > C1 + C2$:
+                        # arbitrage violation
+                        # repair
+                        set $\alpha(x,t)$ such that $V(x,t,F_{x,t})$=$V(x,t+t1,F_{x,t})$
+                        set $\alpha(x+t,t1)$ such that $V(x+t,t1,F_{x,t})$=$V(x,t+t1,F_{x,t})$
+                        goto 100
+\end{lstlisting}
+
+\section{Backtesting}
+A deep discussion of several detailed approaches to backtesting are given by Tawfik in \cite{T}.
+
 \begin{thebibliography}{99}
     \bibitem{A}
         Aurélien, Alfonsi, 2010, "High Order Discretization Schemes
@@ -365,7 +404,7 @@ where $\delta$ is the simulation time step.
         To Affine Term Structure And Heston Models,"
         Mathematics Of Computation, 79(269), 209-237
     \bibitem{BK}
-        Ben Alaya M, Kebaier A, 2013, “Asymptotic Behavior of the Maximum Likelihood Estimator for Ergodic and Nonergodic Square-root Diffusions.” Stochastic Analysis and Applications, 31(4), 552-573. doi:10.1080/07362994.2013.798175.
+        Ben Alaya, M. and Kebaier A, 2013, “Asymptotic Behavior of the Maximum Likelihood Estimator for Ergodic and Nonergodic Square-root Diffusions.” Stochastic Analysis and Applications, 31(4), 552-573. doi:10.1080/07362994.2013.798175.
     \bibitem{CW}
         Choi, Jaehyuk and Wu, Lixin, 2020, "The Equivalent Constant-elasticity-of-variance (CEV) Volatility
         of the Stochastic-Alpha-Beta-Rho (SABR) Model,"
@@ -373,6 +412,9 @@ where $\delta$ is the simulation time step.
     \bibitem{HKLW}
         Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2014,
         "Arbitrage-Free SABR," {\em Wilmott} (2014):60-75. doi:10.1002/wilm.10290
+    \bibitem{JN}
+        Johnson, Simon and Nonas, Bereshad, 2009, "Arbitrage-Free Construction Of The Swaption Cube,"
+        https://ssrn.com/abstract=1330869
     \bibitem{P}
         Paulot, Louis, 2015, "Asymptotic Implied Volatility at the Second Order with
         Application to the SABR Model," In: Friz, P., Gatheral, J., Gulisashvili,
@@ -382,7 +424,9 @@ where $\delta$ is the simulation time step.
         Springer, Cham. https://doi.org/10.1007/978-3-319-11605-1\_2
         arXiv:0906.0658v3
     \bibitem{PR}
-        Prykhodko, Olha, and Ralchenko, Kostiantyn, 2025, "Discretization and Asymptotic Normality of Drift Parameters Estimator
+        Prykhodko, Olha and Ralchenko, Kostiantyn, 2025, "Discretization and Asymptotic Normality of Drift Parameters Estimator
         in the Cox-Ingersoll-Ross Model," Austrian Journal of Statistics, 54, 82-99. doi:10.17713/ajs.v54i1.1968
+    \bibitem{T}
+        Tawfik, Maged, 2025, "Monte Carlo Simulation of SOFR Yield Curve," Working Paper.
 \end{thebibliography}
 \end{document}
