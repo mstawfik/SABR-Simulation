@@ -308,7 +308,96 @@ They also suggested the following for the consistent estimation of $\theta$
 {t_n^2\,(\,\frac{1}{n^2}\sum_{i<n}\frac{1}{F_i}\,\sum_{i<n}F_i\;-\;1\,)}\,.
 \eeqn
 
-\section{PCA Analysis}
+\section{Option Portfolio}
+An at-the-money implied volatility surface is usually given with respect to a very large grid
+made of a list of option expiries along one dimension, and a list of underlying tenors
+along the other dimension.
+Reduction of the underlying dimensionality is desired for two main reasons.
+First, any realistic simulation of an option portfolio has to reflect the natural stochastic 
+dependence inherent when modeling derivatives on highly correlated underlyings.
+Secondly, full simulation of the entire grid, on a daily basis for long time horizons,
+results in unjustifiable resource and time consumption.
+
+In the next two subsections,
+we propose two approaches for complexity reduction.
+The first approach is based on relating the volatility of all options to the underlying
+stochastic factors of the forward yield curve itself.
+The second approach uses Principal Component Analysis (PCA) to
+achieve dimensionality reduction.
+
+\subsection{Forward Swap Volatility}
+Let us start by assuming the following risk neutral dynamics for the instantaneous forward rate $f(t,T)$,
+which is the rate at time $T$ as observed at time $t$,
+
+\beqn\label{eq:forwards}
+\begin{aligned}
+df(t,T)=&\,\sum_{i=1}^n\,\sigma_i(t,T)\,\bar{\sigma}_i(t,T)\,dt\,+\,\sum_{i=1}^n\,\sigma_i(t,T)\,dW_i(t)\\
+\bar{\sigma}_i(t,T)=&\,\int_t^T\,\sigma_i(t,u)\,du\,,
+\end{aligned}
+\eeqn
+where $dW_i(t)$ are $n$ standard uncorrelated Wiener increments.
+
+Employing Ito's lemma and the arguments of HJM (see~\cite{HJM}), we get
+\beqn
+\frac{dP(t,T)}{P(t,T)}=\,r(t)\,dt \,-
+\,\sum_{i=1}^n\,\bar{\sigma}_i(t,T)\,dW_i(t)\,,
+\eeqn
+where $r(t)=f(t,t)$.
+
+The interest rate forward swap rate $S(t_x,t_s,t_e)$ is the coupon rate of the
+fixed leg of the swap, which is an $\mathcal{F}_t$-martingale under the annuity measure.
+The parameters $t_s\,$, $t_e\,$ are the start and end dates of the swap, respectively,
+and $t_x$ is the rate set date.
+Let the swap-corresponding annuity be defined as
+\beqn
+A(t)=\sum_{i=0}^n\,\pi_i\,P(t,T_i)\qquad t\le t_s\,,
+\eeqn
+where $n$ is the number of payments, $T_i$ is the $i$-th payment date,
+$T_0=t_s$, $T_n=t_e$ and
+$\pi_i$ is a calendar factor.
+The value of $S(t_x,t_s,t_e)$, assuming simple calendar conventions, can be expressed as
+
+\beqn
+S(t_x,t_s,t_e)=\frac{P(t_x,t_s)-P(t_x,t_e)}{A(t_x)}\,.
+\eeqn
+
+Let us write the risk neutral dynamics of $S(t_x,t_s,t_e)$ as
+\beqn
+dS(t,t_s,t_e)=\mu(t)\,dt\,+\,\sigma_{s,e,i}(t)\,dW_i(t)\,.
+\eeqn
+
+Employing Ito's lemma, we have, for $t\le t_s$
+\beqn
+\begin{aligned}
+\sigma_{s,e,i}(t)=&\,\frac{P(t,t_s)-P(t,t_e)}{A^2}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,
+-\,\frac{P(t,t_s)}{A(t)}\,\bar{\sigma}_n(t,t_s)+\,\frac{P(t,t_e)}{A(t)}\,\bar{\sigma}_n(t,t_e)\\[12.5pt]
+=&\,\frac{1}{A(t)}\left(\frac{P(t,t_s)-P(t,t_e)}{A(t)}\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,
+-\,P(t,t_s)\,\bar{\sigma}_n(t,t_s)+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)\\[12.5pt]
+=&\,\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i P(t,T_j)\,\bar{\sigma}_i(t,T_j)\,
+-\,P(t,t_s)\,\bar{\sigma}_n(t,t_s)+\,P(t,t_e)\,\bar{\sigma}_n(t,t_e)\right)
+\end{aligned}
+\eeqn
+
+Substituting from Equation~\eqref{eq:forwards}, we get
+
+\beqn\label{eq:fsvol}
+\begin{aligned}
+\sigma_{s,e,i}(t)=&\frac{1}{A(t)}\left(S(t,t_s,t_e)\,\sum_{j=0}^n\pi_i\, P(t,T_j)\int_t^{T_j}\sigma_i(t,u)\, du\right.\\
+&-\left.\,P(t,t_s)\int_t^{t_s}\sigma_i(t,u)\,du+\,P(t,t_e)\int_t^{t_e}\sigma_i(t,u)\,du\right)\\
+\sigma_{s,e,i}(t)=&\,\frac{S(t,t_s,t_e)}{A(t)}\,\sum_{j=0}^n\pi_i\, P(t,T_j)\int_t^{T_j}\sigma_i(t,u)\, du\\
+&-\,S(t,t_s,t_e)\int_t^{t_s}\sigma_i(t,u)\,du+\,\frac{P(t,t_e)}{A(t)}\int_{t_s}^{t_e}\sigma_i(t,u)\,du\,.
+\end{aligned}
+\eeqn
+
+Equation~\eqref{eq:fsvol} represents the forward swap volatility in terms of the terms
+structure volatilities of the instantaneous forward rates.
+Using this equation one can construct a set of arbitrage-free swap volatilities,
+given a set of instant forward volatilities.
+Similarly, given a set of {\em consistent} swap volatilities, one should be able to deduce,
+at least numerically, the
+instantaneous forward volatilities.
+
+\subsection{PCA Analysis}
 Detailed time series analysis of SOFR interest rate swaptions between 2020 and 2026, showed significant correlation.
 The options included in the dataset included 17 times to expiry and 23 tenors, \ie
 the $X\times T$ set had a cardinality of 391.
@@ -409,6 +498,10 @@ A deep discussion of several detailed approaches to backtesting are given by Taw
         Choi, Jaehyuk and Wu, Lixin, 2020, "The Equivalent Constant-elasticity-of-variance (CEV) Volatility
         of the Stochastic-Alpha-Beta-Rho (SABR) Model,"
         arXiv:1911.13123v3
+    \bibitem{HJM}
+        Heath, D., Jarrow, R. and Morton, A. (1992), "Bond Pricing and the Term Structure of Interest Rates:
+        A New Methodology for Contingent Claims Valuation," {\em Econometrica} 60(1):77-105.
+        doi:10.2307/2951677
     \bibitem{HKLW}
         Hagan, Patrick; Kumar, Deep; Lesnieweski, Andrew S. and Woodward, Diana, 2014,
         "Arbitrage-Free SABR," {\em Wilmott} (2014):60-75. doi:10.1002/wilm.10290
