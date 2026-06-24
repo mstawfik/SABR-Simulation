@@ -228,7 +228,8 @@ $V: X\times T\rightarrow \mathbb{C}_v$.
 
 \section{Forward Stochastic model}\label{sec:sm}
 The current common options market practice is to model the stochastic behavior of interest rate contracts
-using the SABR model, namely
+using the SABR model (for a full discussion of the SABR model and its simulation see Tawfik \cite{T1}).
+In short, the SABR model is given by
 
 \beqn\label{eq:sabr}
 \begin{aligned}
@@ -268,7 +269,6 @@ the SABR model \eqref{eq:sabr}.
 Our model, has the following dynamics
 \beqn\label{eq:cir}
 \begin{aligned}
-&dF_{x,t} =\; F_{x,t}^{\beta_{x,t}} \alpha_{x,t}\, dW_{F_{x,t}}\\
 &d\alpha_{x,t} =\;\theta_{x,t}(\mu_{x,t} - \alpha_{x,t})\,dt\,+\, \nu_{x,t}\,\sqrt\alpha_{x,t}\, dW_{\alpha_{x,t}}\\
 &<\!dW_{F_{x,t}},\, dW_{\alpha_{x,t}}\!> \;=\rho_{x,t}
 \end{aligned}
@@ -304,7 +304,7 @@ Ben Alaya and Kebaier \cite{BK} showed that
 They also suggested the following for the consistent estimation of $\theta$
 
 \beqn
-\hat{\theta}\,=\,\frac{t_n\,(\log{F_n}-\log{F_0}+\frac{t_n}{2n}S^2\sum_{i<n}\frac{1}{F_i})-\frac{t_n}{n}(F_n-F_0)\sum_{i<n}\frac{1}{F_i}}
+\hat{\theta}\,=\,\frac{t_n\,(\log{F_n}-\log{F_0}+\frac{t_n}{2n}\,\nu^2\sum_{i<n}\frac{1}{F_i})-\frac{t_n}{n}(F_n-F_0)\sum_{i<n}\frac{1}{F_i}}
 {t_n^2\,(\,\frac{1}{n^2}\sum_{i<n}\frac{1}{F_i}\,\sum_{i<n}F_i\;-\;1\,)}\,.
 \eeqn
 
@@ -445,11 +445,13 @@ non-negativity condition on $\alpha$.
 In the current work, we chose the $E(0)$ discretization algorithm specified by Alfonsi \cite{A}.
 Using our notation, Alfonsi's $E(0)$ is given by
 
-\beqn
+\beqn\label{eq:disc}
 \hat{\alpha}_{t_{i+1}}=\hat{\alpha}_{t_i}(1-\theta \delta)\,+\,\nu\sqrt{\hat{\alpha_{t_i}}}(W_{t_{i+1}}-W_{t_i})\,+
 \frac{1}{4}\nu^2(W_{t_{i+1}}-W_{t_i})^2 + \delta(\mu\theta-\frac{1}{4}\nu^2)
 \eeqn
 where $\delta$ is the simulation time step.
+Discretization recursion \eqref{eq:disc} is guaranteed to converge, as long as,
+$\nu^2<4\theta\mu$ and $\delta<2/\theta$.
 
 \section{Arbitrage Testing and Fixing}
 Johnson and Nonas \cite{JN} argued that the only arbitrage constraint that needs to be respected
@@ -521,5 +523,7 @@ A deep discussion of several detailed approaches to backtesting are given by Taw
         in the Cox-Ingersoll-Ross Model," Austrian Journal of Statistics, 54, 82-99. doi:10.17713/ajs.v54i1.1968
     \bibitem{T}
         Tawfik, Maged, 2025, "Monte Carlo Simulation of SOFR Yield Curve," Working Paper.
+    \bibitem{T1}
+        Tawfik, Maged, 2026, "SABR Simulation for Risk Management," Working Paper.
 \end{thebibliography}
 \end{document}
