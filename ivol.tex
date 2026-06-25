@@ -276,6 +276,7 @@ Our model, has the following dynamics
 where the index $x,t$ refers to the point in the grid,
 and $\mu_{x,t}$ and $\theta_{x,t}$ are the process mean and
 the mean reversion speed, respectively.
+The values of $\mu_{x,t}, \theta_{x,t}$ and $\nu_{x,t}$ are all non-negative.
 Unless needed for clarity, we will drop the $x,t$ index in the remainder of the work for simplicity of presentation.
 
 \section{Parameter Estimation}
@@ -292,20 +293,20 @@ assuming ergodic behavior and given a time series of forward prices $F_i, i\le n
 that covers a period of $t_n$ years,
 
 \beqn
-\hat{\nu}^2 = \frac{n}{t_n}\,\frac{\sum_{i<n} (F_i-F_{i-1})^2}{\sum_{i<n}F_i}\,.
+\hat{\nu}^2 = \frac{n}{t_n}\,\frac{\sum_{i<n} (\alpha_i-\alpha_{i-1})^2}{\sum_{i<n}\alpha_i}\,.
 \eeqn
 
 Ben Alaya and Kebaier \cite{BK} showed that
 
 \beqn
-\frac{1}{t_n}\,\int_0^{t_n} F_s ds\,\xrightarrow{\;\;\mathbb{P}\;\;}\,\mu\quad \text{as} \quad t\!\longrightarrow\!\infty\,.
+\frac{1}{t_n}\,\int_0^{t_n} \alpha_s \,ds\,\xrightarrow{\;\;\mathbb{P}\;\;}\,\mu\quad \text{as} \quad t\!\longrightarrow\!\infty\,.
 \eeqn
 
 They also suggested the following for the consistent estimation of $\theta$
 
 \beqn
-\hat{\theta}\,=\,\frac{t_n\,(\log{F_n}-\log{F_0}+\frac{t_n}{2n}\,\nu^2\sum_{i<n}\frac{1}{F_i})-\frac{t_n}{n}(F_n-F_0)\sum_{i<n}\frac{1}{F_i}}
-{t_n^2\,(\,\frac{1}{n^2}\sum_{i<n}\frac{1}{F_i}\,\sum_{i<n}F_i\;-\;1\,)}\,.
+\hat{\theta}\,=\,\frac{t_n\,(\log{\alpha_n}-\log{\alpha_0}+\frac{t_n}{2n}\,\nu^2\sum_{i<n}\frac{1}{\alpha_i})-\frac{t_n}{n}(\alpha_n-\alpha_0)\sum_{i<n}\frac{1}{\alpha_i}}
+{t_n^2\,(\,\frac{1}{n^2}\sum_{i<n}\!\frac{1}{\alpha_i}\;\sum_{i<n}\!\alpha_i\;-\;1\,)}\,.
 \eeqn
 
 \section{Option Portfolio}
